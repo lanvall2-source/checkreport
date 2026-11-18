@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { DEMO_SITES } from "@/lib/constants";
 import { compressImage } from "@/lib/imageCompressor";
+import { saveSitesToCloud } from "@/lib/cloudStore";
 import type { InspectionSite, CheckItem, InspectionStatus } from "@/types";
 
 interface MobileRemoteViewProps {
@@ -68,21 +69,10 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
       // ignore
     }
 
-    // 서버리스 동기화
+    // 클라우드(Supabase / 서버리스) 영구 동기화
     setSyncToast({ message: "PC 대시보드로 전송 중...", type: "loading" });
     try {
-      const res = await fetch("/api/sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          roomId: selectedSiteId,
-          data: updatedSites,
-          sender: "mobile-remote",
-        }),
-      });
-
-      if (!res.ok) throw new Error("서버 전송 오류");
-
+      await saveSitesToCloud(updatedSites);
       setSyncToast({ message: successMsg, type: "success" });
       setTimeout(() => setSyncToast(null), 3000);
     } catch (err: any) {

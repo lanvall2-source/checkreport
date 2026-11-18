@@ -28,6 +28,9 @@ import { compressImage } from "@/lib/imageCompressor";
 import { printInspectionReport } from "./ReportPrintModal";
 import { RemoteQrModal } from "./RemoteQrModal";
 import { SiteBuilderModal } from "./SiteBuilderModal";
+import { SupabaseSettingsModal } from "./SupabaseSettingsModal";
+import { saveSitesToCloud, fetchSitesFromCloud } from "@/lib/cloudStore";
+import { isSupabaseConfigured } from "@/lib/supabaseClient";
 import type { InspectionSite, CheckItem, InspectionStatus, UserSession } from "@/types";
 
 interface DualInspectionDemoProps {
@@ -50,8 +53,9 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
   const [activeTab, setActiveTab] = useState<"items" | "defects" | "report">("items");
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [builderModalOpen, setBuilderModalOpen] = useState(false);
+  const [supabaseModalOpen, setSupabaseModalOpen] = useState(false);
 
-  // 새 현장 생성 처리
+  // 새 현장 생성 처리 (클라우드 영구 저장)
   const handleCreateSite = async (newSite: InspectionSite) => {
     const updatedSites = [newSite, ...sites];
     setSites(updatedSites);
@@ -65,17 +69,9 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
       // ignore
     }
 
-    // 서버리스 클라우드 즉시 동기화 등록
+    // 클라우드(Supabase / 서버리스) 영구 저장
     try {
-      await fetch("/api/sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          roomId: newSite.id,
-          data: updatedSites,
-          sender: "pc-admin-create",
-        }),
-      });
+      await saveSitesToCloud(updatedSites, userSession?.email);
 
       // 동일 기기 다른 탭 즉시 동기화
       if (typeof BroadcastChannel !== "undefined") {
@@ -115,26 +111,24 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
     }
   }, [userSession]);
 
-  // 서버에서 최신 데이터 1회 불러오기 함수
+  // 서버/클라우드에서 최신 데이터 불러오기 함수
   const fetchLatestSync = async (silent = false) => {
     if (!silent) setIsRefreshing(true);
     try {
-      const res = await fetch(`/api/sync?roomId=${selectedSiteId}`);
-      if (res.ok) {
-        const json = await res.json();
-        if (json.success && json.exists && json.data) {
-          setSites(json.data);
-          try {
-            localStorage.setItem("checkreport_sites", JSON.stringify(json.data));
-          } catch {
-            // ignore
-          }
+      const result = await fetchSitesFromCloud(selectedSiteId);
+      if (result.sites && result.sites.length > 0) {
+        setSites(result.sites);
+        try {
+          localStorage.setItem("checkreport_sites", JSON.stringify(result.sites));
+        } catch {
+          // ignore
         }
       }
       const now = new Date();
       setLastSyncTime(`${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`);
       if (!silent) {
-        setSyncToast("클라우드 현장 데이터 동기화 완료");
+        const sourceLabel = result.source === "supabase" ? "Supabase 클라우드 DB" : "클라우드 서버리스";
+        setSyncToast(`${sourceLabel} 동기화 완료`);
         setTimeout(() => setSyncToast(null), 2500);
       }
     } catch {
@@ -197,18 +191,10 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
       setSites(updatedSites);
       localStorage.setItem("checkreport_sites", JSON.stringify(updatedSites));
 
-      // 서버 동기화
-      await fetch("/api/sync", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          roomId: selectedSiteId,
-          data: updatedSites,
-          sender: "pc-admin",
-        }),
-      });
+      // 클라우드(Supabase / 서버리스) 영구 저장
+      await saveSitesToCloud(updatedSites, userSession?.email);
 
-      setSyncToast("사진이 등록되어 보고서에 반영되었습니다.");
+      setSyncToast("사진이 등록되어 클라우드 보고서에 반영되었습니다.");
       setTimeout(() => setSyncToast(null), 2500);
     } catch (err) {
       console.error(err);
@@ -237,6 +223,20 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
 
           {/* 우측 퀵 액션 버튼 바 */}
           <div className="flex flex-wrap items-center gap-2.5">
+            {/* Supabase 클라우드 DB 연동 버튼 */}
+            <button
+              onClick={() => setSupabaseModalOpen(true)}
+              className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+                isSupabaseConfigured
+                  ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100"
+                  : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
+              }`}
+              title="클라우드 데이터베이스 설정"
+            >
+              <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}`} />
+              <span>{isSupabaseConfigured ? "Supabase 연동됨" : "DB 연동"}</span>
+            </button>
+
             {/* 새 현장 등록 & 점검표 빌더 버튼 */}
             <button
               onClick={() => setBuilderModalOpen(true)}
@@ -758,6 +758,12 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
           onCreated={handleCreateSite}
           defaultCompanyName={userSession?.companyName}
           defaultManagerName={userSession?.managerName}
+        />
+
+        {/* Supabase 클라우드 데이터베이스 설정 모달 */}
+        <SupabaseSettingsModal
+          isOpen={supabaseModalOpen}
+          onClose={() => setSupabaseModalOpen(false)}
         />
       </div>
     </section>
