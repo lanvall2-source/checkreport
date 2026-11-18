@@ -341,19 +341,6 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
                     </button>
                   ))}
                 </div>
-                      <span className="text-[10px] font-bold text-slate-400 shrink-0">빠른 테스트:</span>
-                      {SAMPLE_PHOTOS.slice(0, 2).map((sp, sIdx) => (
-                        <button
-                          key={sIdx}
-                          onClick={() => handleInjectSample(item.id, sp.url, sp.label)}
-                          className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border border-slate-200 shrink-0 cursor-pointer transition-colors"
-                        >
-                          {sp.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {/* 불합격 시 조치 후(After) 사진 섹션 */}
                 {item.status === "fail" && (
