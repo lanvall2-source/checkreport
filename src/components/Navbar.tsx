@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { ClipboardCheck, Shield, Menu, X, ArrowRight } from "lucide-react";
+import { ClipboardCheck, Shield, Menu, X, ArrowRight, UserCheck, LogOut, Sparkles, LogIn } from "lucide-react";
+import type { UserSession } from "@/types";
 
 interface NavbarProps {
+  userSession: UserSession | null;
   onOpenWaitlist: () => void;
+  onOpenLogin: () => void;
   onOpenAdmin: () => void;
+  onLogout: () => void;
 }
 
-export function Navbar({ onOpenWaitlist, onOpenAdmin }: NavbarProps) {
+export function Navbar({
+  userSession,
+  onOpenWaitlist,
+  onOpenLogin,
+  onOpenAdmin,
+  onLogout,
+}: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -67,32 +77,81 @@ export function Navbar({ onOpenWaitlist, onOpenAdmin }: NavbarProps) {
             </a>
           </nav>
 
-          {/* 우측 CTA 및 관리자 버튼 */}
+          {/* 우측 로그인 세션 & CTA 버튼 */}
           <div className="hidden sm:flex items-center gap-3">
-            <button
-              onClick={onOpenAdmin}
-              className="text-xs font-semibold text-slate-500 hover:text-slate-800 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer flex items-center gap-1"
-            >
-              <Shield className="w-3.5 h-3.5" />
-              <span>관리자</span>
-            </button>
-            <button
-              onClick={onOpenWaitlist}
-              className="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-[#2563EB] hover:bg-blue-700 text-white shadow-md hover:shadow-blue-500/25 transition-all cursor-pointer flex items-center gap-1.5 active:scale-98"
-            >
-              <span>14일 무료 체험</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            {userSession ? (
+              /* 로그인 상태 */
+              <div className="flex items-center gap-2.5 bg-slate-50 border border-slate-200/80 px-3 py-1.5 rounded-xl shadow-2xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <div className="text-left">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-slate-800">
+                        {userSession.managerName || "회원"} 님
+                      </span>
+                      <span className="text-[10px] font-black px-1.5 py-0.5 rounded-full bg-blue-600 text-white flex items-center gap-0.5">
+                        <Sparkles className="w-2.5 h-2.5" />
+                        <span>Pro 체험 D-14</span>
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      {userSession.companyName || userSession.email}
+                    </span>
+                  </div>
+                </div>
+                <div className="h-5 w-px bg-slate-200 ml-1" />
+                <button
+                  onClick={onLogout}
+                  className="text-xs font-semibold text-slate-400 hover:text-rose-600 px-2 py-1 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer flex items-center gap-1"
+                  title="로그아웃"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span className="text-[11px]">로그아웃</span>
+                </button>
+              </div>
+            ) : (
+              /* 비로그인 상태 */
+              <>
+                <button
+                  onClick={onOpenLogin}
+                  className="text-xs font-bold text-slate-600 hover:text-blue-600 px-3 py-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer flex items-center gap-1.5"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>로그인</span>
+                </button>
+                <button
+                  onClick={onOpenAdmin}
+                  className="text-xs font-semibold text-slate-400 hover:text-slate-700 px-2.5 py-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer flex items-center gap-1"
+                  title="관리자 콘솔"
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={onOpenWaitlist}
+                  className="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-[#2563EB] hover:bg-blue-700 text-white shadow-md hover:shadow-blue-500/25 transition-all cursor-pointer flex items-center gap-1.5 active:scale-98"
+                >
+                  <span>14일 무료 체험</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
           </div>
 
           {/* 모바일 햄버거 메뉴 버튼 */}
           <div className="flex sm:hidden items-center gap-2">
-            <button
-              onClick={onOpenWaitlist}
-              className="px-3 py-1.5 rounded-lg font-bold text-xs bg-[#2563EB] text-white shadow-xs"
-            >
-              무료 체험
-            </button>
+            {userSession ? (
+              <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-lg text-xs font-bold text-blue-700">
+                <UserCheck className="w-3.5 h-3.5" />
+                <span>D-14 체험중</span>
+              </div>
+            ) : (
+              <button
+                onClick={onOpenLogin}
+                className="px-2.5 py-1.5 rounded-lg font-bold text-xs bg-slate-100 text-slate-700"
+              >
+                로그인
+              </button>
+            )}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-100"
@@ -106,6 +165,27 @@ export function Navbar({ onOpenWaitlist, onOpenAdmin }: NavbarProps) {
         {/* 모바일 드롭다운 메뉴 */}
         {mobileMenuOpen && (
           <div className="sm:hidden border-t border-slate-200 py-3 space-y-2 animate-in slide-in-from-top-2 duration-150">
+            {userSession && (
+              <div className="px-3 py-2 bg-blue-50/70 rounded-xl mx-2 mb-2 border border-blue-100 flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-bold text-blue-950">
+                    {userSession.managerName} ({userSession.companyName})
+                  </div>
+                  <div className="text-[11px] text-blue-700">
+                    Pro 플랜 무료 체험 잔여 14일 (카드 자동결제 없음)
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onLogout();
+                  }}
+                  className="text-xs text-rose-600 font-bold px-2 py-1 bg-white rounded border border-rose-200"
+                >
+                  로그아웃
+                </button>
+              </div>
+            )}
             <a
               href="#demo"
               onClick={() => setMobileMenuOpen(false)}
@@ -142,16 +222,41 @@ export function Navbar({ onOpenWaitlist, onOpenAdmin }: NavbarProps) {
               자주 묻는 질문 (FAQ)
             </a>
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between px-3">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  onOpenAdmin();
-                }}
-                className="text-xs font-semibold text-slate-500 flex items-center gap-1"
-              >
-                <Shield className="w-3.5 h-3.5" />
-                <span>관리자 로그인</span>
-              </button>
+              {!userSession ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenLogin();
+                    }}
+                    className="text-xs font-bold text-blue-600 flex items-center gap-1"
+                  >
+                    <LogIn className="w-3.5 h-3.5" />
+                    <span>이메일 간편 로그인</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onOpenAdmin();
+                    }}
+                    className="text-xs font-semibold text-slate-500 flex items-center gap-1"
+                  >
+                    <Shield className="w-3.5 h-3.5" />
+                    <span>관리자</span>
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenAdmin();
+                  }}
+                  className="text-xs font-semibold text-slate-500 flex items-center gap-1"
+                >
+                  <Shield className="w-3.5 h-3.5" />
+                  <span>관리자 콘솔</span>
+                </button>
+              )}
             </div>
           </div>
         )}

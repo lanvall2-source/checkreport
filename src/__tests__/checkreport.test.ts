@@ -79,4 +79,24 @@ describe("체크리포트 (CheckReport) SaaS 무결성 테스트", () => {
   it("문제점 공감 카드 3개 정의 확인", () => {
     expect(PROBLEM_CARDS.length).toBe(3);
   });
+
+  it("1초 간편 로그인 세션 구조 및 14일 Opt-in 체험 데이터 검증", () => {
+    const mockSession = {
+      isLoggedIn: true,
+      email: "lanvall2@gmail.com",
+      companyName: "(주)체크리포트",
+      managerName: "김성우 대표",
+      trialDaysLeft: 14,
+      plan: "Pro",
+      loginAt: new Date().toISOString(),
+    };
+
+    localStorage.setItem("checkreport_session", JSON.stringify(mockSession));
+    const loaded = JSON.parse(localStorage.getItem("checkreport_session") || "{}");
+
+    expect(loaded.isLoggedIn).toBe(true);
+    expect(loaded.email).toBe("lanvall2@gmail.com");
+    expect(loaded.trialDaysLeft).toBe(14);
+    expect(loaded.plan).toBe("Pro");
+  });
 });

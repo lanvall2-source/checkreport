@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import { X, CheckCircle2, ShieldCheck, Building2, User, Mail, Phone, Briefcase } from "lucide-react";
 import { INDUSTRY_OPTIONS } from "@/lib/constants";
 import { saveWaitlistSubmission } from "@/lib/storage";
-import type { IndustryCategory } from "@/types";
+import type { IndustryCategory, UserSession } from "@/types";
 
 interface WaitlistModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onAutoLogin?: (session: UserSession) => void;
 }
 
-export function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
+export function WaitlistModal({ isOpen, onClose, onAutoLogin }: WaitlistModalProps) {
   const [companyName, setCompanyName] = useState("");
   const [managerName, setManagerName] = useState("");
   const [email, setEmail] = useState("");
@@ -62,6 +63,23 @@ export function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
     }
   };
 
+  const handleStartConsole = () => {
+    if (onAutoLogin) {
+      const session: UserSession = {
+        isLoggedIn: true,
+        email,
+        companyName,
+        managerName,
+        trialDaysLeft: 14,
+        plan: "Pro",
+        loginAt: new Date().toISOString(),
+      };
+      localStorage.setItem("checkreport_session", JSON.stringify(session));
+      onAutoLogin(session);
+    }
+    handleResetAndClose();
+  };
+
   const handleResetAndClose = () => {
     setIsSuccess(false);
     setErrorMessage(null);
@@ -112,10 +130,10 @@ export function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
             </div>
 
             <button
-              onClick={handleResetAndClose}
-              className="w-full py-3.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-xl shadow-subtle transition-all cursor-pointer mt-4"
+              onClick={handleStartConsole}
+              className="w-full py-3.5 bg-[#2563EB] hover:bg-blue-700 text-white font-bold rounded-xl shadow-subtle transition-all cursor-pointer mt-4 flex items-center justify-center gap-2 active:scale-98"
             >
-              확인 완료
+              <span>지금 바로 체크리포트 시작하기 (1초 로그인)</span>
             </button>
           </div>
         ) : (

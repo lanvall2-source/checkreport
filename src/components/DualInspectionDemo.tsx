@@ -21,10 +21,44 @@ import {
 } from "lucide-react";
 import { DEMO_SITES } from "@/lib/constants";
 import { printInspectionReport } from "./ReportPrintModal";
-import type { InspectionSite, CheckItem, InspectionStatus } from "@/types";
+import type { InspectionSite, CheckItem, InspectionStatus, UserSession } from "@/types";
 
-export function DualInspectionDemo() {
-  const [sites, setSites] = useState<InspectionSite[]>(DEMO_SITES);
+interface DualInspectionDemoProps {
+  userSession?: UserSession | null;
+}
+
+export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}) {
+  const [sites, setSites] = useState<InspectionSite[]>(() => {
+    if (userSession) {
+      return DEMO_SITES.map((s, idx) =>
+        idx === 0
+          ? {
+              ...s,
+              client: userSession.companyName || s.client,
+              managerName: userSession.managerName ? `${userSession.managerName} 담당자` : s.managerName,
+            }
+          : s
+      );
+    }
+    return DEMO_SITES;
+  });
+
+  // 세션 변경 시 첫 번째 현장 회사명 동기화
+  React.useEffect(() => {
+    if (userSession) {
+      setSites((prev) =>
+        prev.map((s, idx) =>
+          idx === 0
+            ? {
+                ...s,
+                client: userSession.companyName || s.client,
+                managerName: userSession.managerName ? `${userSession.managerName} 담당자` : s.managerName,
+              }
+            : s
+        )
+      );
+    }
+  }, [userSession]);
   const [selectedSiteId, setSelectedSiteId] = useState<string>("SITE-2026-001");
   const [activeAdminTab, setActiveAdminTab] = useState<"items" | "defects" | "report">("items");
   const [isSubmittingMobile, setIsSubmittingMobile] = useState<boolean>(false);

@@ -47,3 +47,13 @@ export interface WaitlistSubmission {
   privacyAgreed: boolean;
   createdAt: string;
 }
+
+export interface UserSession {
+  isLoggedIn: boolean;
+  email: string;
+  companyName: string;
+  managerName: string;
+  trialDaysLeft: number;
+  plan: "Pro" | "Starter" | "Enterprise";
+  loginAt: string;
+}
