@@ -167,32 +167,32 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans flex flex-col pb-16">
       {/* 상단 간결한 모바일 헤더 */}
       <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-4 py-3">
-        <div className="max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="max-w-md mx-auto flex items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
             {onExitRemote && (
               <button
                 onClick={onExitRemote}
-                className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white"
+                className="p-1 rounded-lg hover:bg-slate-800 text-slate-400 hover:text-white shrink-0 cursor-pointer"
                 aria-label="돌아가기"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
             )}
-            <div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+            <div className="min-w-0 flex-1">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 whitespace-nowrap inline-block">
                 모바일 현장 촬영
               </span>
-              <h1 className="text-sm font-black truncate max-w-[210px] text-white mt-0.5">
+              <h1 className="text-xs sm:text-sm font-black truncate text-white mt-0.5">
                 {currentSite.siteName}
               </h1>
             </div>
           </div>
 
-          <div className="text-right">
-            <span className="text-xs font-black text-emerald-400">
+          <div className="text-right whitespace-nowrap shrink-0">
+            <span className="text-xs font-black text-emerald-400 block">
               {activeItemIndex + 1} / {currentSite.items.length} 항목
             </span>
-            <span className="block text-[10px] text-slate-400">
+            <span className="text-[10px] text-slate-400">
               완료: {currentSite.completedItems}건
             </span>
           </div>
@@ -201,7 +201,7 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
         {/* 상태 토스트 알림 */}
         {syncToast && (
           <div
-            className={`mt-2 py-1.5 px-3 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-2 ${
+            className={`mt-2 py-1.5 px-3 rounded-xl text-xs font-bold text-center flex items-center justify-center gap-2 break-keep ${
               syncToast.type === "loading"
                 ? "bg-amber-500 text-slate-950"
                 : syncToast.type === "success"
@@ -209,8 +209,8 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
                 : "bg-rose-600 text-white"
             }`}
           >
-            {syncToast.type === "loading" && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-            <span>{syncToast.message}</span>
+            {syncToast.type === "loading" && <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" />}
+            <span className="truncate">{syncToast.message}</span>
           </div>
         )}
       </header>
@@ -218,32 +218,37 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
       {/* 메인 현장 점검 영역 (현장 작업자 맞춤 극단적 심플 UX) */}
       <main className="max-w-md mx-auto w-full px-4 pt-3 flex-1 flex flex-col space-y-3.5">
         {/* 항목 스크롤 탭 바 */}
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none flex-nowrap">
           {currentSite.items.map((it, idx) => (
             <button
               key={it.id}
               onClick={() => setActiveItemIndex(idx)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                 idx === activeItemIndex
                   ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
                   : "bg-slate-800 text-slate-400 hover:text-slate-200"
               }`}
             >
               <span>{idx + 1}. {it.category}</span>
-              {it.photoBefore && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+              {it.photoBefore && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />}
             </button>
           ))}
         </div>
 
         {/* 현재 점검 항목 카드 */}
-        <div className="bg-slate-800/90 rounded-3xl p-4 border border-slate-700/80 shadow-xl space-y-4">
+        <div className="bg-slate-800/90 rounded-3xl p-4 border border-slate-700/80 shadow-xl space-y-3.5">
           <div>
-            <span className="text-[11px] font-bold text-blue-400">
+            <span className="text-[11px] font-bold text-blue-400 block mb-0.5">
               No.{activeItemIndex + 1} · {currentItem.category}
             </span>
-            <h2 className="text-base font-black text-white leading-snug mt-0.5">
+            <h2 className="text-sm sm:text-base font-black text-white leading-snug break-keep">
               {currentItem.title}
             </h2>
+            {currentItem.standard && (
+              <p className="text-[11px] text-slate-400 mt-1.5 break-keep leading-relaxed bg-slate-900/50 p-2.5 rounded-xl border border-slate-700/50">
+                📋 <strong className="text-slate-300">점검 기준:</strong> {currentItem.standard}
+              </p>
+            )}
           </div>
 
           {/* 1. 큼직한 사진 촬영 영역 */}
@@ -255,8 +260,8 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
                   alt="현장 사진"
                   className="w-full h-full object-cover"
                 />
-                <label className="absolute bottom-3 right-3 bg-slate-900/90 hover:bg-black text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg cursor-pointer flex items-center gap-1.5 border border-slate-700 active:scale-95 transition-transform">
-                  <Camera className="w-4 h-4 text-blue-400" />
+                <label className="absolute bottom-3 right-3 bg-slate-900/90 hover:bg-black text-white text-xs font-bold px-3 py-2 rounded-xl shadow-lg cursor-pointer flex items-center gap-1.5 border border-slate-700 active:scale-95 transition-transform whitespace-nowrap">
+                  <Camera className="w-4 h-4 text-blue-400 shrink-0" />
                   <span>사진 다시 찍기</span>
                   <input
                     type="file"
@@ -284,12 +289,12 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
                     <Camera className="w-7 h-7" />
                   )}
                 </div>
-                <div className="text-center">
-                  <span className="text-sm font-black text-white block">
+                <div className="text-center px-4">
+                  <span className="text-sm font-black text-white block break-keep">
                     현장 사진 촬영하기 (터치)
                   </span>
-                  <span className="text-[11px] text-slate-400 mt-0.5 block">
-                    카메라가 바로 켜지며 자동 압축됩니다
+                  <span className="text-[11px] text-slate-400 mt-0.5 block break-keep">
+                    카메라가 켜지며 고화질 1024px로 자동 압축됩니다
                   </span>
                 </div>
                 <input
@@ -310,7 +315,7 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
           {/* 2. 위치 선택 (원터치 칩) */}
           <div className="space-y-1.5">
             <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1">
-              <MapPin className="w-3.5 h-3.5 text-blue-400" />
+              <MapPin className="w-3.5 h-3.5 text-blue-400 shrink-0" />
               <span>위치 선택 (터치):</span>
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -318,7 +323,7 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
                 <button
                   key={loc}
                   onClick={() => handleSelectLocation(loc)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                     currentItem.defectLocation === loc
                       ? "bg-blue-600 text-white border-blue-500 font-black shadow-xs"
                       : "bg-slate-700/60 text-slate-300 border-slate-600 hover:bg-slate-700"
@@ -336,25 +341,25 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => handleSetStatus("pass")}
-                className={`py-3.5 rounded-2xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 border ${
+                className={`py-3.5 rounded-2xl text-xs sm:text-sm font-black flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer transition-all active:scale-95 border whitespace-nowrap ${
                   currentItem.status === "pass"
                     ? "bg-emerald-600 text-white border-emerald-500 shadow-lg shadow-emerald-600/30"
                     : "bg-slate-700/60 text-slate-300 border-slate-600 hover:bg-slate-700"
                 }`}
               >
-                <CheckCircle2 className="w-5 h-5" />
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <span>적합 (통과)</span>
               </button>
 
               <button
                 onClick={() => handleSetStatus("fail")}
-                className={`py-3.5 rounded-2xl text-xs sm:text-sm font-black flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 border ${
+                className={`py-3.5 rounded-2xl text-xs sm:text-sm font-black flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer transition-all active:scale-95 border whitespace-nowrap ${
                   currentItem.status === "fail"
                     ? "bg-rose-600 text-white border-rose-500 shadow-lg shadow-rose-600/30"
                     : "bg-slate-700/60 text-slate-300 border-slate-600 hover:bg-slate-700"
                 }`}
               >
-                <XCircle className="w-5 h-5" />
+                <XCircle className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <span>지적 (불합격)</span>
               </button>
             </div>
@@ -364,7 +369,7 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
           {currentItem.status === "fail" && (
             <div className="p-3 bg-rose-950/40 border border-rose-800/60 rounded-2xl space-y-2 animate-in fade-in duration-150">
               <span className="text-[11px] font-bold text-rose-300 flex items-center gap-1">
-                <AlertTriangle className="w-3.5 h-3.5" />
+                <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                 <span>조치 지시 사항 선택:</span>
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -372,7 +377,7 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
                   <button
                     key={note}
                     onClick={() => handleSelectNote(note)}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                       currentItem.actionNotes === note
                         ? "bg-rose-600 text-white border-rose-500 font-bold"
                         : "bg-slate-800 text-rose-200 border-rose-900/60 hover:bg-slate-700"
@@ -391,25 +396,25 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
           <button
             onClick={() => setActiveItemIndex((prev) => Math.max(0, prev - 1))}
             disabled={activeItemIndex === 0}
-            className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 font-bold text-xs rounded-xl border border-slate-700 transition-colors cursor-pointer"
+            className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 font-bold text-xs rounded-xl border border-slate-700 transition-colors cursor-pointer whitespace-nowrap"
           >
-            ← 이전 항목
+            ← 이전
           </button>
 
           {activeItemIndex < currentSite.items.length - 1 ? (
             <button
               onClick={() => setActiveItemIndex((prev) => prev + 1)}
-              className="flex-2 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
+              className="flex-[2] py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 whitespace-nowrap"
             >
-              <span>다음 항목 점검</span>
+              <span>다음 항목</span>
               <span>→</span>
             </button>
           ) : (
             <button
               onClick={() => broadcastUpdate(sites, "🎉 전체 점검이 완료되어 PC 보고서로 전송되었습니다.")}
-              className="flex-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-98"
+              className="flex-[2] py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 whitespace-nowrap"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-4 h-4 shrink-0" />
               <span>전체 점검 전송 완료</span>
             </button>
           )}

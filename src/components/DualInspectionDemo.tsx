@@ -207,42 +207,42 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
     <section id="demo" className="py-16 sm:py-24 bg-[#F8FAFC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* 상단 섹션 제목 및 헤더 */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-          <div>
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 mb-8">
+          <div className="min-w-0">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-3 shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+              <Sparkles className="w-3.5 h-3.5 text-blue-600 shrink-0" />
               <span>현장 점검 관리자 콘솔</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-black text-[#0F172A] tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-black text-[#0F172A] tracking-tight break-keep">
               PC 관리자 와이드 대시보드
             </h2>
-            <p className="mt-2 text-xs sm:text-base text-slate-600 font-medium">
+            <p className="mt-2 text-xs sm:text-base text-slate-600 font-medium break-keep">
               모바일에서 전송된 현장 사진이 집계되며, A4 2단 사진대지 보고서로 즉시 출력됩니다.
             </p>
           </div>
 
           {/* 우측 퀵 액션 버튼 바 */}
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             {/* Supabase 클라우드 DB 연동 버튼 */}
             <button
               onClick={() => setSupabaseModalOpen(true)}
-              className={`px-3 py-2.5 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs ${
+              className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs whitespace-nowrap shrink-0 ${
                 isSupabaseConfigured
                   ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100"
                   : "bg-white text-slate-700 border-slate-200 hover:bg-slate-50"
               }`}
               title="클라우드 데이터베이스 설정"
             >
-              <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}`} />
+              <span className={`w-2 h-2 rounded-full shrink-0 ${isSupabaseConfigured ? "bg-emerald-500 animate-pulse" : "bg-slate-300"}`} />
               <span>{isSupabaseConfigured ? "Supabase 연동됨" : "DB 연동"}</span>
             </button>
 
             {/* 새 현장 등록 & 점검표 빌더 버튼 */}
             <button
               onClick={() => setBuilderModalOpen(true)}
-              className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-black rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-98"
+              className="px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-black rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-98 whitespace-nowrap shrink-0"
             >
-              <Plus className="w-4 h-4 stroke-[3]" />
+              <Plus className="w-4 h-4 stroke-[3] shrink-0" />
               <span>새 현장 등록 / 점검표 빌더</span>
             </button>
 
@@ -250,20 +250,20 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
             <button
               onClick={() => fetchLatestSync(false)}
               disabled={isRefreshing}
-              className="px-3.5 py-2.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+              className="px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl border border-slate-200 shadow-2xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50 whitespace-nowrap shrink-0"
               title="클라우드 현장 데이터 새로고침"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${isRefreshing ? "animate-spin" : ""}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-blue-600 shrink-0 ${isRefreshing ? "animate-spin" : ""}`} />
               <span>동기화 ({lastSyncTime})</span>
             </button>
 
             {/* 스마트폰 QR 연동 모달 */}
             <button
               onClick={() => setQrModalOpen(true)}
-              className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-2 active:scale-98"
+              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-98 whitespace-nowrap shrink-0"
             >
-              <QrCode className="w-4 h-4 text-emerald-400" />
-              <span>스마트폰 QR 연결</span>
+              <QrCode className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>스마트폰 QR</span>
             </button>
 
             {/* 모바일 점검 전용 뷰 열기 */}
@@ -271,11 +271,11 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
               href={`/?mode=remote&site=${selectedSiteId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2.5 bg-[#2563EB] hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 active:scale-98"
+              className="px-3.5 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all flex items-center gap-1.5 active:scale-98 whitespace-nowrap shrink-0"
             >
-              <Smartphone className="w-4 h-4" />
-              <span>모바일 점검기 열기</span>
-              <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+              <Smartphone className="w-4 h-4 shrink-0" />
+              <span>모바일 점검기</span>
+              <ExternalLink className="w-3.5 h-3.5 opacity-80 shrink-0" />
             </a>
           </div>
         </div>
@@ -296,46 +296,48 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
         {/* ========================================================= */}
         <div className="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden flex flex-col">
           {/* 상단 브라우저 바 */}
-          <div className="bg-slate-900 text-white px-6 py-4 flex flex-wrap items-center justify-between border-b border-slate-800 gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <span className="w-3 h-3 rounded-full bg-rose-500 inline-block" />
-                <span className="w-3 h-3 rounded-full bg-amber-500 inline-block" />
-                <span className="w-3 h-3 rounded-full bg-emerald-500 inline-block" />
+          <div className="bg-slate-900 text-white px-5 sm:px-6 py-3.5 flex items-center justify-between border-b border-slate-800 gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex gap-1.5 shrink-0">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
               </div>
-              <span className="text-xs sm:text-sm font-bold text-slate-200 ml-1">
-                체크리포트 통합 현장 관리자 콘솔 — {currentSite.siteName}
+              <span className="text-xs sm:text-sm font-bold text-slate-200 truncate">
+                통합 관리 콘솔 — {currentSite.siteName}
               </span>
             </div>
 
-            <div className="flex items-center gap-3 text-xs">
-              <span className="text-slate-400 font-mono text-[11px] flex items-center gap-1.5">
+            <div className="flex items-center gap-2.5 text-xs shrink-0">
+              <span className="text-slate-400 font-mono text-[11px] hidden sm:flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-blue-400" />
-                <span>동기화 주기: 5분</span>
+                <span>5분 주기</span>
               </span>
               <button
                 onClick={() => printInspectionReport(currentSite)}
-                className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer text-xs"
+                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer text-xs whitespace-nowrap active:scale-95"
               >
-                <Printer className="w-3.5 h-3.5" />
-                <span>A4 사진대지 인쇄 / PDF</span>
+                <Printer className="w-3.5 h-3.5 shrink-0" />
+                <span>A4 사진대지 인쇄</span>
               </button>
             </div>
           </div>
 
           {/* 현장 선택 및 메타 지표 바 */}
-          <div className="p-5 border-b border-slate-100 bg-slate-50/70 flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
-              <span className="text-xs font-bold text-slate-500 shrink-0">점검 현장:</span>
+          <div className="p-4 sm:p-5 border-b border-slate-100 bg-slate-50/70 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            {/* 현장 선택 탭 (가로 스크롤 보호) */}
+            <div className="flex items-center gap-2 overflow-x-auto scrollbar-none flex-nowrap pb-1 -mb-1 w-full md:w-auto">
+              <span className="text-xs font-bold text-slate-500 shrink-0">현장:</span>
               {sites.map((s) => (
                 <button
                   key={s.id}
                   onClick={() => setSelectedSiteId(s.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 whitespace-nowrap transition-all cursor-pointer max-w-[180px] sm:max-w-[240px] truncate ${
                     s.id === selectedSiteId
                       ? "bg-[#2563EB] text-white shadow-xs"
                       : "bg-white border border-slate-200 text-slate-700 hover:bg-slate-100"
                   }`}
+                  title={s.siteName}
                 >
                   {s.siteName}
                 </button>
@@ -343,7 +345,7 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
 
               <button
                 onClick={() => setBuilderModalOpen(true)}
-                className="px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 bg-blue-50 border border-dashed border-blue-300 text-blue-700 hover:bg-blue-100 transition-all flex items-center gap-1 cursor-pointer"
+                className="px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 whitespace-nowrap bg-blue-50 border border-dashed border-blue-300 text-blue-700 hover:bg-blue-100 transition-all flex items-center gap-1 cursor-pointer"
                 title="직접 새 현장 만들기"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -351,64 +353,64 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
               </button>
             </div>
 
-            {/* 4대 주요 지표 */}
-            <div className="flex items-center gap-3 shrink-0">
-              <div className="px-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs">
-                <span className="text-slate-400 font-medium">총 항목: </span>
+            {/* 4대 주요 지표 (모바일 2x2, 데스크톱 가로 나열) */}
+            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 shrink-0 w-full md:w-auto pt-1 md:pt-0">
+              <div className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs flex items-center justify-between sm:justify-start gap-1">
+                <span className="text-slate-400 font-medium">총 항목</span>
                 <strong className="text-slate-900">{currentSite.totalItems}건</strong>
               </div>
-              <div className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs">
-                <span className="text-emerald-700 font-medium">적합: </span>
+              <div className="px-2.5 py-1.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs flex items-center justify-between sm:justify-start gap-1">
+                <span className="text-emerald-700 font-medium">적합</span>
                 <strong className="text-emerald-900">{currentSite.completedItems}건</strong>
               </div>
-              <div className="px-3 py-1.5 bg-rose-50 border border-rose-200 rounded-xl text-xs">
-                <span className="text-rose-700 font-medium">지적(미조치): </span>
+              <div className="px-2.5 py-1.5 bg-rose-50 border border-rose-200 rounded-xl text-xs flex items-center justify-between sm:justify-start gap-1">
+                <span className="text-rose-700 font-medium">지적</span>
                 <strong className="text-rose-900">{currentSite.failedItems}건</strong>
               </div>
-              <div className="px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-xl text-xs">
-                <span className="text-blue-700 font-medium">진행률: </span>
+              <div className="px-2.5 py-1.5 bg-blue-50 border border-blue-200 rounded-xl text-xs flex items-center justify-between sm:justify-start gap-1">
+                <span className="text-blue-700 font-medium">진행률</span>
                 <strong className="text-blue-900">{currentSite.progressPercent}%</strong>
               </div>
             </div>
           </div>
 
-          {/* 3대 메인 탭 */}
-          <div className="flex border-b border-slate-200 px-6 bg-white text-xs sm:text-sm font-bold text-slate-600 gap-2">
+          {/* 3대 메인 탭 (가로 스크롤 보호로 글 밀림 완전 방지) */}
+          <div className="flex border-b border-slate-200 px-4 sm:px-6 bg-white text-xs sm:text-sm font-bold text-slate-600 gap-1 sm:gap-2 overflow-x-auto scrollbar-none flex-nowrap">
             <button
               onClick={() => setActiveTab("items")}
-              className={`py-3.5 px-4 border-b-2 cursor-pointer transition-colors ${
+              className={`py-3 sm:py-3.5 px-3 sm:px-4 border-b-2 cursor-pointer transition-colors whitespace-nowrap shrink-0 ${
                 activeTab === "items"
                   ? "border-blue-600 text-blue-600 font-black"
                   : "border-transparent hover:text-slate-900"
               }`}
             >
-              1. 전체 점검 항목 및 사진 현황 ({currentSite.items.length})
+              1. 전체 점검 항목 및 사진 ({currentSite.items.length})
             </button>
             <button
               onClick={() => setActiveTab("defects")}
-              className={`py-3.5 px-4 border-b-2 cursor-pointer transition-colors flex items-center gap-2 ${
+              className={`py-3 sm:py-3.5 px-3 sm:px-4 border-b-2 cursor-pointer transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 activeTab === "defects"
                   ? "border-blue-600 text-blue-600 font-black"
                   : "border-transparent hover:text-slate-900"
               }`}
             >
-              <span>2. 지적 결함 및 보수 조치 추적</span>
+              <span>2. 지적 결함 추적</span>
               {currentSite.failedItems > 0 && (
-                <span className="w-5 h-5 rounded-full bg-rose-600 text-white text-[11px] flex items-center justify-center font-bold">
+                <span className="px-1.5 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold">
                   {currentSite.failedItems}
                 </span>
               )}
             </button>
             <button
               onClick={() => setActiveTab("report")}
-              className={`py-3.5 px-4 border-b-2 cursor-pointer transition-colors flex items-center gap-2 ${
+              className={`py-3 sm:py-3.5 px-3 sm:px-4 border-b-2 cursor-pointer transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
                 activeTab === "report"
                   ? "border-blue-600 text-blue-600 font-black"
                   : "border-transparent hover:text-slate-900"
               }`}
             >
-              <Printer className="w-4 h-4 text-blue-600" />
-              <span>3. A4 2단 사진대지 보고서 미리보기</span>
+              <Printer className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+              <span>3. A4 사진대지 미리보기</span>
             </button>
           </div>
 
@@ -419,45 +421,46 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
             {/* ========================================================= */}
             {activeTab === "items" && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-                  <span>점검표: <strong>{currentSite.templateTitle}</strong></span>
-                  <span>모바일에서 촬영한 사진이 자동으로 아래 표에 등록됩니다.</span>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 font-medium gap-1">
+                  <span className="truncate">점검표: <strong className="text-slate-800">{currentSite.templateTitle}</strong></span>
+                  <span className="text-[11px] text-slate-400">모바일에서 촬영한 사진이 실시간 자동 등록됩니다.</span>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-                  <table className="w-full text-left text-xs border-collapse">
+                {/* 테이블 스크롤 래퍼 (모바일/작은 화면에서 가로 스크롤로 보호) */}
+                <div className="bg-white rounded-2xl border border-slate-200 overflow-x-auto shadow-xs">
+                  <table className="w-full text-left text-xs border-collapse min-w-[760px]">
                     <thead className="bg-slate-100/80 text-slate-700 font-bold border-b border-slate-200">
                       <tr>
-                        <th className="py-3 px-4 w-12 text-center">No</th>
-                        <th className="py-3 px-4 w-28">구분</th>
-                        <th className="py-3 px-4 min-w-[200px]">점검 항목 및 기준</th>
-                        <th className="py-3 px-4 w-36 text-center">현장 사진 (Before)</th>
-                        <th className="py-3 px-4 w-36 text-center">조치 사진 (After)</th>
-                        <th className="py-3 px-4 w-24 text-center">판정</th>
-                        <th className="py-3 px-4 w-28 text-center">관리</th>
+                        <th className="py-3 px-3 w-12 text-center whitespace-nowrap">No</th>
+                        <th className="py-3 px-3 w-28 whitespace-nowrap">구분</th>
+                        <th className="py-3 px-4 min-w-[240px]">점검 항목 및 기준</th>
+                        <th className="py-3 px-3 w-36 text-center whitespace-nowrap">현장 사진 (Before)</th>
+                        <th className="py-3 px-3 w-36 text-center whitespace-nowrap">조치 사진 (After)</th>
+                        <th className="py-3 px-3 w-24 text-center whitespace-nowrap">판정</th>
+                        <th className="py-3 px-3 w-28 text-center whitespace-nowrap">관리</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {currentSite.items.map((item, idx) => (
                         <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="py-3.5 px-4 text-center font-mono text-slate-400">
+                          <td className="py-3.5 px-3 text-center font-mono text-slate-400 whitespace-nowrap">
                             {idx + 1}
                           </td>
-                          <td className="py-3.5 px-4">
+                          <td className="py-3.5 px-3 whitespace-nowrap">
                             <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold text-[11px]">
                               {item.category}
                             </span>
                           </td>
-                          <td className="py-3.5 px-4">
-                            <div className="font-bold text-slate-900 text-xs sm:text-sm">
+                          <td className="py-3.5 px-4 break-keep">
+                            <div className="font-bold text-slate-900 text-xs sm:text-sm leading-snug">
                               {item.title}
                             </div>
-                            <div className="text-[11px] text-slate-500 mt-0.5">
+                            <div className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
                               기준: {item.standard}
                             </div>
                             {item.defectLocation && (
                               <div className="text-[10px] text-rose-600 mt-1 font-semibold flex items-center gap-1">
-                                <AlertTriangle className="w-3 h-3" />
+                                <AlertTriangle className="w-3 h-3 shrink-0" />
                                 <span>위치: {item.defectLocation}</span>
                               </div>
                             )}
@@ -649,18 +652,18 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
             {/* ========================================================= */}
             {activeTab === "report" && (
               <div className="space-y-4 max-w-4xl mx-auto">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-200 gap-3">
                   <div>
-                    <h3 className="text-base font-black text-slate-900">
-                      {currentSite.templateTitle} — 국토부/공문 규격 A4 2단 사진대지
+                    <h3 className="text-sm sm:text-base font-black text-slate-900 break-keep">
+                      {currentSite.templateTitle} — A4 사진대지 인쇄 양식
                     </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5 break-keep">
                       현장에서 등록된 사진이 2단 격자로 자동 배치되며 결재란과 함께 PDF로 즉시 인쇄됩니다.
                     </p>
                   </div>
                   <button
                     onClick={() => printInspectionReport(currentSite)}
-                    className="px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-98"
+                    className="px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 whitespace-nowrap shrink-0 self-start sm:self-auto"
                   >
                     <Printer className="w-4 h-4" />
                     <span>실제 A4 PDF 인쇄하기</span>
@@ -668,21 +671,21 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
                 </div>
 
                 {/* 실제 A4 사진대지 프리뷰 시트 */}
-                <div className="bg-white border-2 border-slate-400 rounded-2xl p-6 sm:p-8 shadow-md text-xs font-sans space-y-4">
+                <div className="bg-white border-2 border-slate-400 rounded-2xl p-4 sm:p-8 shadow-md text-xs font-sans space-y-4 overflow-hidden">
                   {/* 표지 헤더 및 결재란 */}
                   <div className="border-b-2 border-slate-900 pb-4">
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
                         <span className="text-xs font-bold text-slate-500 block mb-0.5">
                           공사 감리 및 안전 점검 보고서
                         </span>
-                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                        <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                           현 장 사 진 대 지
                         </h2>
                       </div>
 
                       {/* 3단 결재란 */}
-                      <table className="border border-slate-400 text-center text-[10px]">
+                      <table className="border border-slate-400 text-center text-[10px] w-full sm:w-auto self-end sm:self-auto">
                         <thead>
                           <tr className="bg-slate-100">
                             <th className="border border-slate-400 px-3 py-1 font-bold">담당자</th>
@@ -691,7 +694,7 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="h-10">
+                          <tr className="h-9 sm:h-10">
                             <td className="border border-slate-400 px-3 text-slate-400">(서명)</td>
                             <td className="border border-slate-400 px-3 text-slate-400">(인)</td>
                             <td className="border border-slate-400 px-3 text-slate-400">(인)</td>
@@ -700,15 +703,15 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
                       </table>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 text-xs text-slate-700 mt-3 pt-3 border-t border-slate-200">
-                      <div>공사명: <strong>{currentSite.siteName}</strong></div>
-                      <div>담당: <strong>{currentSite.managerName}</strong></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-2 text-xs text-slate-700 mt-3 pt-3 border-t border-slate-200">
+                      <div className="truncate">공사명: <strong>{currentSite.siteName}</strong></div>
+                      <div className="truncate">담당: <strong>{currentSite.managerName}</strong></div>
                       <div>점검일자: <strong>{currentSite.scheduledDate}</strong></div>
                     </div>
                   </div>
 
-                  {/* 사진대지 그리드 (A4 표준 2열 배치) */}
-                  <div className="grid grid-cols-2 gap-4 pt-2">
+                  {/* 사진대지 그리드 (모바일 1열, 태블릿/PC 2열) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
                     {currentSite.items.map((item, idx) => (
                       <div key={item.id} className="border border-slate-300 rounded-xl p-3 space-y-2 bg-slate-50/50">
                         <div className="aspect-4/3 bg-slate-200/80 rounded-lg overflow-hidden border border-slate-300 flex items-center justify-center">
@@ -725,7 +728,7 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
                               {item.status === "pass" ? "✓ 적합" : item.status === "fail" ? "✗ 불합격" : "미점검"}
                             </span>
                           </div>
-                          <div className="font-bold text-xs text-slate-900 leading-snug truncate">
+                          <div className="font-bold text-xs text-slate-900 leading-snug break-keep line-clamp-2">
                             {item.title}
                           </div>
                           {item.defectLocation && (

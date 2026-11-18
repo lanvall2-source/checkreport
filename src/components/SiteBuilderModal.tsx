@@ -379,66 +379,69 @@ export function SiteBuilderModal({
               {items.map((item, index) => (
                 <div
                   key={index}
-                  className="p-3 bg-white border border-slate-200 rounded-2xl shadow-2xs hover:border-slate-300 transition-colors flex flex-col md:flex-row items-start md:items-center gap-3 text-xs"
+                  className="p-3 bg-white border border-slate-200 rounded-2xl shadow-2xs hover:border-slate-300 transition-colors flex flex-col md:flex-row items-start md:items-center gap-2.5 text-xs"
                 >
-                  <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 font-mono font-bold flex items-center justify-center shrink-0 text-[11px]">
-                    {index + 1}
-                  </span>
-
-                  {/* 구분(카테고리) */}
-                  <div className="w-full md:w-32 shrink-0">
-                    <input
-                      type="text"
-                      value={item.category}
-                      onChange={(e) => handleItemChange(index, "category", e.target.value)}
-                      placeholder="구분(예: 철근공사)"
-                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 font-semibold focus:outline-hidden focus:border-blue-500"
-                    />
+                  <div className="flex items-center gap-2 w-full md:w-auto">
+                    <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-500 font-mono font-bold flex items-center justify-center shrink-0 text-[11px]">
+                      {index + 1}
+                    </span>
+                    {/* 구분(카테고리) */}
+                    <div className="flex-1 md:w-32 md:flex-none">
+                      <input
+                        type="text"
+                        value={item.category}
+                        onChange={(e) => handleItemChange(index, "category", e.target.value)}
+                        placeholder="구분(예: 철근)"
+                        className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 font-semibold focus:outline-hidden focus:border-blue-500"
+                      />
+                    </div>
                   </div>
 
                   {/* 점검 항목명 */}
-                  <div className="flex-1 w-full">
+                  <div className="w-full md:flex-1">
                     <input
                       type="text"
                       value={item.title}
                       onChange={(e) => handleItemChange(index, "title", e.target.value)}
                       placeholder="점검 항목명 (예: 개구부 덮개 및 난간대 설치 상태)"
-                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 font-bold text-slate-900 focus:outline-hidden focus:border-blue-500"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 font-bold text-slate-900 focus:outline-hidden focus:border-blue-500 break-keep"
                     />
                   </div>
 
                   {/* 점검 기준 */}
-                  <div className="flex-1 w-full">
+                  <div className="w-full md:flex-1">
                     <input
                       type="text"
                       value={item.standard}
                       onChange={(e) => handleItemChange(index, "standard", e.target.value)}
                       placeholder="판정 기준 (예: 틈새 50mm 이내 밀폐 고정)"
-                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 focus:outline-hidden focus:border-blue-500"
+                      className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-600 focus:outline-hidden focus:border-blue-500 break-keep"
                     />
                   </div>
 
-                  {/* 사진 필수 체크박스 */}
-                  <label className="flex items-center gap-1.5 shrink-0 cursor-pointer select-none px-2 py-1 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100">
-                    <Camera className="w-3.5 h-3.5 text-blue-600" />
-                    <span className="text-[11px] font-bold text-slate-700">사진 필수</span>
-                    <input
-                      type="checkbox"
-                      checked={item.photoRequired}
-                      onChange={(e) => handleItemChange(index, "photoRequired", e.target.checked)}
-                      className="w-3.5 h-3.5 text-blue-600 rounded-sm"
-                    />
-                  </label>
+                  <div className="flex items-center justify-between md:justify-end gap-2 w-full md:w-auto shrink-0 pt-1 md:pt-0 border-t md:border-t-0 border-slate-100">
+                    {/* 사진 필수 체크박스 */}
+                    <label className="flex items-center gap-1.5 shrink-0 cursor-pointer select-none px-2 py-1 bg-slate-50 rounded-lg border border-slate-200 hover:bg-slate-100 whitespace-nowrap">
+                      <Camera className="w-3.5 h-3.5 text-blue-600" />
+                      <span className="text-[11px] font-bold text-slate-700">사진 필수</span>
+                      <input
+                        type="checkbox"
+                        checked={item.photoRequired}
+                        onChange={(e) => handleItemChange(index, "photoRequired", e.target.checked)}
+                        className="w-3.5 h-3.5 text-blue-600 rounded-sm"
+                      />
+                    </label>
 
-                  {/* 삭제 버튼 */}
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveItem(index)}
-                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer shrink-0"
-                    title="항목 삭제"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                    {/* 삭제 버튼 */}
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveItem(index)}
+                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer shrink-0"
+                      title="항목 삭제"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

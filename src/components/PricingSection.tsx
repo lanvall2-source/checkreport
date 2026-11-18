@@ -14,11 +14,11 @@ export function PricingSection({ onOpenWaitlist }: PricingSectionProps) {
           <span className="text-xs font-bold text-[#2563EB] bg-blue-50 border border-blue-200 px-3 py-1 rounded-full uppercase tracking-wider">
             Transparent Pricing
           </span>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0F172A] tracking-tight mt-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0F172A] tracking-tight mt-3 break-keep">
             점검 현장 규모에 맞춘 <br className="hidden sm:inline" />
             합리적인 월 구독 요금제
           </h2>
-          <p className="mt-4 text-base text-slate-600 font-medium">
+          <p className="mt-4 text-sm sm:text-base text-slate-600 font-medium break-keep">
             모든 플랜에 14일 무료 체험이 제공되며, 신용카드 등록 없이 바로 시작할 수 있습니다.
           </p>
         </div>
@@ -34,19 +34,19 @@ export function PricingSection({ onOpenWaitlist }: PricingSectionProps) {
               }`}
             >
               {plan.highlight && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#2563EB] text-white text-[11px] font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-sm">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-[#2563EB] text-white text-[11px] font-black uppercase tracking-wider px-3.5 py-1 rounded-full shadow-sm whitespace-nowrap">
                   {plan.badge}
                 </div>
               )}
 
               <div>
                 {!plan.highlight && (
-                  <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                  <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md whitespace-nowrap">
                     {plan.badge}
                   </span>
                 )}
                 <h3 className="text-2xl font-black text-[#0F172A] mt-3">{plan.name}</h3>
-                <p className="text-xs text-slate-500 mt-2 font-medium min-h-[36px]">
+                <p className="text-xs text-slate-500 mt-2 font-medium min-h-[36px] break-keep leading-relaxed">
                   {plan.description}
                 </p>
 

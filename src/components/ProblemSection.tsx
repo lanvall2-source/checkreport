@@ -23,11 +23,11 @@ export function ProblemSection() {
           <span className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1 rounded-full uppercase tracking-wider">
             Pain Points
           </span>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0F172A] tracking-tight mt-3">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#0F172A] tracking-tight mt-3 break-keep">
             현장 점검 끝내고 사무실 와서 <br className="hidden sm:inline" />
             또다시 한글·엑셀과 씨름하고 계신가요?
           </h2>
-          <p className="mt-4 text-base text-slate-600 font-medium">
+          <p className="mt-4 text-sm sm:text-base text-slate-600 font-medium break-keep">
             비효율적인 수기 점검과 사진 대지 작성 방식은 현장의 시간을 뺏고 중요한 안전 조치를 누락시킵니다.
           </p>
         </div>
@@ -42,16 +42,16 @@ export function ProblemSection() {
                 <div className="w-12 h-12 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center mb-6">
                   {getIcon(card.icon)}
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight break-keep">
                   {card.title}
                 </h3>
-                <p className="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed font-medium">
+                <p className="mt-3 text-xs sm:text-sm text-slate-600 leading-relaxed font-medium break-keep">
                   {card.description}
                 </p>
               </div>
 
               <div className="mt-6 pt-5 border-t border-slate-100">
-                <blockquote className="text-xs italic text-slate-500 font-semibold bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <blockquote className="text-xs italic text-slate-500 font-semibold bg-slate-50 p-3 rounded-xl border border-slate-100 break-keep">
                   {card.quote}
                 </blockquote>
               </div>
