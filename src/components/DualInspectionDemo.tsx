@@ -63,6 +63,30 @@ export function DualInspectionDemo() {
     }, 800);
   };
 
+  // 실제 사진 업로드 핸들러 (Before / After)
+  const handlePhotoUpload = (itemId: string, type: "before" | "after", e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      setSites((prevSites) =>
+        prevSites.map((site) => {
+          if (site.id !== selectedSiteId) return site;
+          const updatedItems = site.items.map((it) => {
+            if (it.id !== itemId) return it;
+            return type === "before"
+              ? { ...it, photoBefore: dataUrl }
+              : { ...it, photoAfter: dataUrl, actionStatus: "resolved" as const };
+          });
+          return { ...site, items: updatedItems };
+        })
+      );
+    };
+    reader.readAsDataURL(file);
+  };
+
   const defectItems = currentSite.items.filter((i) => i.status === "fail");
 
   return (
@@ -205,17 +229,34 @@ export function DualInspectionDemo() {
                       className="p-3.5 rounded-xl border border-slate-200 bg-white flex items-center justify-between gap-3 shadow-2xs"
                     >
                       <div className="flex items-center gap-3">
-                        {item.photoBefore ? (
-                          <img
-                            src={item.photoBefore}
-                            alt="현장사진"
-                            className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0"
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 shrink-0">
-                            <Camera className="w-5 h-5" />
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          {item.photoBefore ? (
+                            <div className="relative">
+                              <img
+                                src={item.photoBefore}
+                                alt="현장사진"
+                                className="w-12 h-12 rounded-lg object-cover border border-slate-200"
+                              />
+                              {item.photoAfter && (
+                                <span className="absolute bottom-0 left-0 text-[8px] bg-rose-600 text-white px-1 rounded-bl-lg font-bold">전</span>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="w-12 h-12 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400">
+                              <Camera className="w-5 h-5" />
+                            </div>
+                          )}
+                          {item.photoAfter && (
+                            <div className="relative">
+                              <img
+                                src={item.photoAfter}
+                                alt="조치후사진"
+                                className="w-12 h-12 rounded-lg object-cover border-2 border-emerald-500"
+                              />
+                              <span className="absolute bottom-0 left-0 text-[8px] bg-emerald-600 text-white px-1 rounded-bl-lg font-bold">후</span>
+                            </div>
+                          )}
+                        </div>
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
@@ -388,15 +429,63 @@ export function DualInspectionDemo() {
                         </div>
                       </div>
 
-                      {/* 사진 미리보기 */}
-                      {item.photoBefore && (
-                        <div className="relative rounded-xl overflow-hidden border border-slate-200">
-                          <img src={item.photoBefore} alt="현장" className="w-full h-24 object-cover" />
-                          <span className="absolute bottom-1 right-1 text-[9px] bg-black/60 text-white px-1.5 py-0.5 rounded font-mono">
-                            GPS 인증됨
-                          </span>
-                        </div>
-                      )}
+                      {/* 사진 미리보기 및 조치 전/후 사진 업로드 */}
+                      <div className="space-y-1.5">
+                        {item.photoBefore ? (
+                          <div className="relative rounded-xl overflow-hidden border border-slate-200 group">
+                            <img src={item.photoBefore} alt="현장" className="w-full h-24 object-cover" />
+                            <span className="absolute bottom-1 right-1 text-[9px] bg-black/60 text-white px-1.5 py-0.5 rounded font-mono">
+                              GPS 인증됨
+                            </span>
+                            <label className="absolute top-1 right-1 bg-black/70 hover:bg-black text-white text-[9px] font-bold px-2 py-0.5 rounded cursor-pointer flex items-center gap-1 transition-colors">
+                              <Camera className="w-3 h-3" />
+                              <span>사진 변경</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handlePhotoUpload(item.id, "before", e)}
+                              />
+                            </label>
+                          </div>
+                        ) : (
+                          <label className="w-full py-3 border-2 border-dashed border-slate-300 hover:border-blue-400 rounded-xl flex items-center justify-center gap-1.5 text-[10px] text-slate-500 hover:text-blue-600 bg-slate-50 hover:bg-blue-50/30 cursor-pointer transition-colors">
+                            <Camera className="w-4 h-4 text-slate-400" />
+                            <span className="font-bold">현장 사진 촬영 / 첨부하기</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => handlePhotoUpload(item.id, "before", e)}
+                            />
+                          </label>
+                        )}
+
+                        {/* 불합격 시 조치 후(After) 사진 추가 섹션 */}
+                        {item.status === "fail" && (
+                          <div>
+                            {item.photoAfter ? (
+                              <div className="relative rounded-xl overflow-hidden border-2 border-emerald-500">
+                                <img src={item.photoAfter} alt="조치후" className="w-full h-24 object-cover" />
+                                <span className="absolute bottom-1 left-1 text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-bold">
+                                  ✓ 조치 완료 (After)
+                                </span>
+                              </div>
+                            ) : (
+                              <label className="w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-lg flex items-center justify-center gap-1.5 text-[10px] font-bold cursor-pointer transition-colors">
+                                <Camera className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>+ 조치 완료(After) 사진 등록</span>
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  className="hidden"
+                                  onChange={(e) => handlePhotoUpload(item.id, "after", e)}
+                                />
+                              </label>
+                            )}
+                          </div>
+                        )}
+                      </div>
 
                       {/* 판정 토글 버튼 (합격/불합격/해당없음) */}
                       <div className="grid grid-cols-3 gap-1.5 pt-1">

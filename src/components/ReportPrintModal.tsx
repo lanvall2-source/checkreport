@@ -114,7 +114,20 @@ export function printInspectionReport(site: InspectionSite) {
             (item, index) => `
           <div class="photo-card">
             ${
-              item.photoBefore
+              item.photoAfter
+                ? `
+                  <div style="display:flex; height: 180px;">
+                    <div style="flex:1; position:relative; border-right:1px solid #cbd5e1;">
+                      <img src="${item.photoBefore}" class="photo-img" style="height:100%;" alt="조치전" />
+                      <span style="position:absolute; bottom:4px; left:4px; background:rgba(220,38,38,0.85); color:#fff; font-size:10px; padding:2px 6px; border-radius:4px; font-weight:bold;">조치 전 (지적)</span>
+                    </div>
+                    <div style="flex:1; position:relative;">
+                      <img src="${item.photoAfter}" class="photo-img" style="height:100%;" alt="조치후" />
+                      <span style="position:absolute; bottom:4px; left:4px; background:rgba(22,163,74,0.85); color:#fff; font-size:10px; padding:2px 6px; border-radius:4px; font-weight:bold;">조치 후 (완료)</span>
+                    </div>
+                  </div>
+                `
+                : item.photoBefore
                 ? `<img src="${item.photoBefore}" class="photo-img" alt="점검사진" />`
                 : `<div class="photo-img" style="display:flex;align-items:center;justify-content:center;color:#94a3b8;">사진 미등록</div>`
             }
