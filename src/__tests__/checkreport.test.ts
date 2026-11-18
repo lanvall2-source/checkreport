@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { saveWaitlistSubmission, loadWaitlist } from "../lib/storage";
 import { DEMO_SITES, PRICING_PLANS, PROBLEM_CARDS } from "../lib/constants";
+import { PRESET_TEMPLATES } from "../lib/checklistTemplates";
 
 // Node 환경용 localStorage Mock
 const storageMock: Record<string, string> = {};
@@ -98,5 +99,24 @@ describe("체크리포트 (CheckReport) SaaS 무결성 테스트", () => {
     expect(loaded.email).toBe("lanvall2@gmail.com");
     expect(loaded.trialDaysLeft).toBe(14);
     expect(loaded.plan).toBe("Pro");
+  });
+
+  it("업종별 표준 점검표 템플릿 4종(건설, 시설, 매장, 공장안전) 데이터 무결성 검증", () => {
+    expect(PRESET_TEMPLATES.length).toBe(4);
+    const categories = PRESET_TEMPLATES.map((t) => t.category);
+    expect(categories).toContain("건설·시공·감리");
+    expect(categories).toContain("시설·건물관리");
+    expect(categories).toContain("매장·프랜차이즈");
+    expect(categories).toContain("제조·공장안전");
+
+    // 모든 템플릿은 최소 4개 이상의 점검 항목을 포함해야 함
+    PRESET_TEMPLATES.forEach((tpl) => {
+      expect(tpl.items.length).toBeGreaterThanOrEqual(4);
+      tpl.items.forEach((item) => {
+        expect(item.title.length).toBeGreaterThan(0);
+        expect(item.standard.length).toBeGreaterThan(0);
+        expect(item.category.length).toBeGreaterThan(0);
+      });
+    });
   });
 });

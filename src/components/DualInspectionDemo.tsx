@@ -21,11 +21,13 @@ import {
   Clock,
   Filter,
   Download,
+  Plus,
 } from "lucide-react";
 import { DEMO_SITES } from "@/lib/constants";
 import { compressImage } from "@/lib/imageCompressor";
 import { printInspectionReport } from "./ReportPrintModal";
 import { RemoteQrModal } from "./RemoteQrModal";
+import { SiteBuilderModal } from "./SiteBuilderModal";
 import type { InspectionSite, CheckItem, InspectionStatus, UserSession } from "@/types";
 
 interface DualInspectionDemoProps {
@@ -47,6 +49,47 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
   const [selectedSiteId, setSelectedSiteId] = useState<string>("SITE-2026-001");
   const [activeTab, setActiveTab] = useState<"items" | "defects" | "report">("items");
   const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [builderModalOpen, setBuilderModalOpen] = useState(false);
+
+  // 새 현장 생성 처리
+  const handleCreateSite = async (newSite: InspectionSite) => {
+    const updatedSites = [newSite, ...sites];
+    setSites(updatedSites);
+    setSelectedSiteId(newSite.id);
+    setActiveTab("items");
+    setBuilderModalOpen(false);
+
+    try {
+      localStorage.setItem("checkreport_sites", JSON.stringify(updatedSites));
+    } catch {
+      // ignore
+    }
+
+    // 서버리스 클라우드 즉시 동기화 등록
+    try {
+      await fetch("/api/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          roomId: newSite.id,
+          data: updatedSites,
+          sender: "pc-admin-create",
+        }),
+      });
+
+      // 동일 기기 다른 탭 즉시 동기화
+      if (typeof BroadcastChannel !== "undefined") {
+        const bc = new BroadcastChannel("checkreport_sync_channel");
+        bc.postMessage({ type: "UPDATE_SITES", sites: updatedSites });
+        bc.close();
+      }
+    } catch {
+      // ignore
+    }
+
+    setSyncToast(`새 현장 '${newSite.siteName}'이 등록되었습니다. 모바일에서 바로 점검할 수 있습니다.`);
+    setTimeout(() => setSyncToast(null), 3500);
+  };
 
   // 동기화 상태: 5분 주기 + 수동 새로고침
   const [lastSyncTime, setLastSyncTime] = useState<string>("방금 전");
@@ -194,6 +237,15 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
 
           {/* 우측 퀵 액션 버튼 바 */}
           <div className="flex flex-wrap items-center gap-2.5">
+            {/* 새 현장 등록 & 점검표 빌더 버튼 */}
+            <button
+              onClick={() => setBuilderModalOpen(true)}
+              className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs sm:text-sm font-black rounded-xl shadow-md transition-all cursor-pointer flex items-center gap-1.5 active:scale-98"
+            >
+              <Plus className="w-4 h-4 stroke-[3]" />
+              <span>새 현장 등록 / 점검표 빌더</span>
+            </button>
+
             {/* 수동 동기화 버튼 (5분 주기 안내) */}
             <button
               onClick={() => fetchLatestSync(false)}
@@ -288,6 +340,15 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
                   {s.siteName}
                 </button>
               ))}
+
+              <button
+                onClick={() => setBuilderModalOpen(true)}
+                className="px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 bg-blue-50 border border-dashed border-blue-300 text-blue-700 hover:bg-blue-100 transition-all flex items-center gap-1 cursor-pointer"
+                title="직접 새 현장 만들기"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ 현장 추가</span>
+              </button>
             </div>
 
             {/* 4대 주요 지표 */}
@@ -688,6 +749,15 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
           onClose={() => setQrModalOpen(false)}
           siteId={selectedSiteId}
           siteName={currentSite.siteName}
+        />
+
+        {/* 새 점검 현장 등록 & 점검표 빌더 모달 */}
+        <SiteBuilderModal
+          isOpen={builderModalOpen}
+          onClose={() => setBuilderModalOpen(false)}
+          onCreated={handleCreateSite}
+          defaultCompanyName={userSession?.companyName}
+          defaultManagerName={userSession?.managerName}
         />
       </div>
     </section>
