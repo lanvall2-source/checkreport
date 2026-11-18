@@ -262,3 +262,26 @@ export const FAQ_LIST = [
       "아닙니다. 14일 무료 체험 기간 동안 Pro 플랜의 모든 기능(A4 사진대지 무제한 출력, 미조치 트래킹, 엑셀 다운로드)을 워터마크 없이 자유롭게 실제 현장에서 테스트해 보실 수 있습니다.",
   },
 ];
+
+export const SAMPLE_PHOTOS = [
+  {
+    label: "🧱 옹벽 균열 지적 사진",
+    url: "https://images.unsplash.com/photo-1541888946425-d0fbb186156f?auto=format&fit=crop&w=600&q=80",
+    desc: "지하 2층 옹벽 균열 0.3mm 발생",
+  },
+  {
+    label: "💧 배관 누수 지적 사진",
+    url: "https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&w=600&q=80",
+    desc: "기계실 급수 배관 이음부 미세 누수",
+  },
+  {
+    label: "⚠️ 안전 난간대 미설치",
+    url: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=600&q=80",
+    desc: "개구부 안전 난간대 미설치 구간 적발",
+  },
+  {
+    label: "✨ 보수 조치완료 (After)",
+    url: "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=600&q=80",
+    desc: "에폭시 인젝션 주입 및 표면 마감 완료",
+  },
+];
