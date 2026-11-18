@@ -73,6 +73,15 @@ export function RemoteQrModal({ isOpen, onClose, siteId, siteName }: RemoteQrMod
 
         {/* 모바일 URL 복사 & 직접 열기 */}
         <div className="space-y-2">
+          <div className="p-2.5 bg-blue-50/80 rounded-xl border border-blue-200 text-left text-xs">
+            <span className="font-bold text-blue-900 block mb-1">
+              📱 스마트폰 브라우저 주소창에 직접 쳐서 접속할 때:
+            </span>
+            <code className="text-blue-700 font-mono font-bold text-xs select-all bg-white px-2 py-1 rounded border border-blue-200 block truncate">
+              {mobileUrl}
+            </code>
+          </div>
+
           <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-xl border border-slate-200 text-xs">
             <input
               type="text"
@@ -82,7 +91,7 @@ export function RemoteQrModal({ isOpen, onClose, siteId, siteName }: RemoteQrMod
             />
             <button
               onClick={handleCopy}
-              className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-lg border border-slate-200 transition-colors flex items-center gap-1 shrink-0 shadow-2xs"
+              className="px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 font-bold rounded-lg border border-slate-200 transition-colors flex items-center gap-1 shrink-0 shadow-2xs cursor-pointer"
             >
               {copied ? (
                 <>

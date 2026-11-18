@@ -20,6 +20,7 @@ import {
   FileSpreadsheet,
 } from "lucide-react";
 import { DEMO_SITES, SAMPLE_PHOTOS } from "@/lib/constants";
+import { compressImage } from "@/lib/imageCompressor";
 import { printInspectionReport } from "./ReportPrintModal";
 import { RemoteQrModal } from "./RemoteQrModal";
 import type { InspectionSite, CheckItem, InspectionStatus, UserSession } from "@/types";
@@ -89,7 +90,7 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
       // ignore
     }
 
-    // (B) 서버리스 폴링 (실제 스마트폰 ↔ PC 서로 다른 기기간 동기화)
+    // (B) 서버리스 폴링 (실제 스마트폰 ↔ PC 서로 다른 기기간 동기화, 1초 주기)
     const interval = setInterval(async () => {
       try {
         const res = await fetch(`/api/sync?roomId=${selectedSiteId}`);
@@ -97,10 +98,29 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
         const json = await res.json();
         if (json.success && json.exists && json.data) {
           const remoteSites: InspectionSite[] = json.data;
-          // 변경점이 있을 때만 업데이트
           setSites((prev) => {
             if (JSON.stringify(prev) !== JSON.stringify(remoteSites)) {
-              triggerSyncFeedback("⚡ 스마트폰에서 새 현장 사진이 도착했습니다! (A4 사진대지 반영)");
+              // 변경된 첫 번째 아이템 id 추적하여 하이라이트
+              const currentOldSite = prev.find((s) => s.id === selectedSiteId);
+              const currentNewSite = remoteSites.find((s) => s.id === selectedSiteId);
+              let changedItemId: string | undefined = undefined;
+              if (currentOldSite && currentNewSite) {
+                const diff = currentNewSite.items.find((newItem, idx) => {
+                  const oldItem = currentOldSite.items[idx];
+                  return (
+                    !oldItem ||
+                    oldItem.photoBefore !== newItem.photoBefore ||
+                    oldItem.photoAfter !== newItem.photoAfter ||
+                    oldItem.status !== newItem.status
+                  );
+                });
+                if (diff) changedItemId = diff.id;
+              }
+
+              triggerSyncFeedback(
+                "⚡ 스마트폰에서 새 현장 사진 및 점검 내역이 실시간 동기화되었습니다!",
+                changedItemId
+              );
               return remoteSites;
             }
             return prev;
@@ -109,7 +129,7 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
       } catch {
         // network polling error ignore
       }
-    }, 2000);
+    }, 1000);
 
     return () => {
       if (bc) bc.close();
@@ -196,14 +216,17 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
     );
   };
 
-  // 실제 사진 업로드 핸들러 (Before / After)
-  const handlePhotoUpload = (itemId: string, type: "before" | "after", e: React.ChangeEvent<HTMLInputElement>) => {
+  // 실제 사진 업로드 핸들러 (Before / After) - 캔버스 1024px 스마트 압축 적용
+  const handlePhotoUpload = async (itemId: string, type: "before" | "after", e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
+    triggerSyncFeedback(`⏳ 고용량 사진 최적화 중... (${Math.round(file.size / 1024)}KB)`);
+
+    try {
+      const compressResult = await compressImage(file, 1024, 1024, 0.75);
+      const dataUrl = compressResult.dataUrl;
+
       updateAndBroadcastSites(
         (prevSites) =>
           prevSites.map((site) => {
@@ -216,11 +239,13 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
             });
             return { ...site, items: updatedItems };
           }),
-        "📸 모바일에서 촬영한 사진이 PC 관리자 콘솔과 A4 사진대지에 1초 만에 꽂혔습니다!",
+        `📸 사진이 ${compressResult.compressedSizeKb}KB로 최적화되어 PC A4 사진대지에 1초 만에 꽂혔습니다!`,
         itemId
       );
-    };
-    reader.readAsDataURL(file);
+    } catch (err: any) {
+      console.error("사진 압축 오류:", err);
+      triggerSyncFeedback("사진 처리 중 오류가 발생했습니다.");
+    }
   };
 
   // 샘플 사진 원클릭 주입 핸들러
