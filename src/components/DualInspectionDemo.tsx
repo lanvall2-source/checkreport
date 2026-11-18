@@ -771,27 +771,27 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
                                 onChange={(e) => handlePhotoUpload(item.id, "before", e)}
                               />
                             </label>
-
-                            {/* 💡 1초 테스트: 샘플 사진 넣기 버튼 */}
-                            <div className="flex items-center gap-1 text-[10px] text-slate-400">
-                              <span className="shrink-0 font-bold">1초 테스트:</span>
-                              <button
-                                type="button"
-                                onClick={() => handleInjectSamplePhoto(item.id, SAMPLE_PHOTOS[0].url, "옹벽 균열")}
-                                className="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200 font-bold transition-colors"
-                              >
-                                🧱 균열 사진
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleInjectSamplePhoto(item.id, SAMPLE_PHOTOS[1].url, "배관 누수")}
-                                className="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200 font-bold transition-colors"
-                              >
-                                💧 누수 사진
-                              </button>
-                            </div>
                           </div>
                         )}
+
+                        {/* 💡 1초 테스트: 사진 빠른 변경/주입 버튼 (항상 노출) */}
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400 pt-0.5">
+                          <span className="shrink-0 font-bold">1초 테스트:</span>
+                          <button
+                            type="button"
+                            onClick={() => handleInjectSamplePhoto(item.id, SAMPLE_PHOTOS[0].url, "옹벽 균열")}
+                            className="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200 font-bold transition-colors cursor-pointer"
+                          >
+                            🧱 균열 사진
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleInjectSamplePhoto(item.id, SAMPLE_PHOTOS[1].url, "배관 누수")}
+                            className="px-2 py-0.5 rounded bg-slate-100 hover:bg-blue-50 text-slate-600 hover:text-blue-600 border border-slate-200 font-bold transition-colors cursor-pointer"
+                          >
+                            💧 누수 사진
+                          </button>
+                        </div>
 
                         {/* 불합격 시 조치 후(After) 사진 추가 섹션 */}
                         {item.status === "fail" && (

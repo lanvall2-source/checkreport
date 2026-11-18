@@ -278,7 +278,7 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
                     {/* 재촬영 버튼 */}
                     <label className="absolute top-2 right-2 bg-white/95 hover:bg-white text-slate-800 text-xs font-bold px-2.5 py-1.5 rounded-lg shadow-sm cursor-pointer flex items-center gap-1.5 transition-all active:scale-95 border border-slate-200">
                       <Camera className="w-3.5 h-3.5 text-blue-600" />
-                      <span>다시 찍기</span>
+                      <span>카메라로 다시 찍기</span>
                       <input
                         type="file"
                         accept="image/*"
@@ -325,9 +325,22 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
                         }}
                       />
                     </label>
+                  </div>
+                )}
 
-                    {/* 1초 테스트 샘플 사진 주입 버튼 */}
-                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1">
+                {/* 사진 교체/테스트 버튼 (항상 노출되어 원클릭 실시간 테스트 가능) */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1">
+                  <span className="text-[10px] font-bold text-slate-400 shrink-0">1초 테스트:</span>
+                  {SAMPLE_PHOTOS.slice(0, 3).map((sp, sIdx) => (
+                    <button
+                      key={sIdx}
+                      onClick={() => handleInjectSample(item.id, sp.url, sp.label)}
+                      className="text-[10px] font-bold px-2 py-1 rounded-lg bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-600 border border-slate-200 shrink-0 cursor-pointer transition-colors active:scale-95"
+                    >
+                      {sp.label}
+                    </button>
+                  ))}
+                </div>
                       <span className="text-[10px] font-bold text-slate-400 shrink-0">빠른 테스트:</span>
                       {SAMPLE_PHOTOS.slice(0, 2).map((sp, sIdx) => (
                         <button
