@@ -1,4 +1,5 @@
 import type { InspectionSite } from "@/types";
+import { printInspectionReport } from "@/components/ReportPrintModal";
 
 /**
  * 안전한 파일명을 위해 특수문자 제거
@@ -363,4 +364,4 @@ function createPrintHtmlElement(site: InspectionSite): HTMLElement {
  * 3. A4 인쇄창 호출 (기존 호환 유지)
  * ============================================================================
  */
-export { printInspectionReport } from "@/components/ReportPrintModal";
+export { printInspectionReport };
