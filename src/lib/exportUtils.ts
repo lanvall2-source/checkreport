@@ -1,17 +1,10 @@
 import type { InspectionSite } from "@/types";
 
-declare global {
-  interface Window {
-    XLSX?: any;
-    html2pdf?: any;
-  }
-}
-
 /**
  * 안전한 파일명을 위해 특수문자 제거
  */
 function sanitizeFilename(name: string): string {
-  return name.replace(/[/\\?%*:|"<>]/g, "_").trim() || "현장점검보고서";
+  return name.replace(new RegExp("[\\\\/?:*\"<>|]", "g"), "_").trim() || "현장점검보고서";
 }
 
 /**
@@ -58,12 +51,13 @@ export async function exportToExcel(site: InspectionSite): Promise<boolean> {
   const filename = `${sanitizeFilename(site.siteName)}_점검보고서_${getDateString()}.xlsx`;
 
   try {
+    const win = window as any;
     // 1. SheetJS (XLSX) 라이브러리 동적 로드
-    if (!window.XLSX) {
+    if (!win.XLSX) {
       await loadExternalScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
     }
 
-    const XLSX = window.XLSX;
+    const XLSX = win.XLSX;
     if (!XLSX) throw new Error("XLSX library unavailable");
 
     // 2. 워크북 및 시트 데이터 구성
@@ -183,12 +177,13 @@ export async function exportToPdf(site: InspectionSite, targetElementId?: string
   const filename = `${sanitizeFilename(site.siteName)}_현장점검보고서_${getDateString()}.pdf`;
 
   try {
+    const win = window as any;
     // 1. html2pdf 라이브러리 동적 로드
-    if (!window.html2pdf) {
+    if (!win.html2pdf) {
       await loadExternalScript("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js");
     }
 
-    const html2pdf = window.html2pdf;
+    const html2pdf = win.html2pdf;
     if (!html2pdf) throw new Error("html2pdf library unavailable");
 
     // 2. 렌더링할 타겟 엘리먼트 획득 또는 오프스크린 컨테이너 생성
