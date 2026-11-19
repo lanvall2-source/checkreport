@@ -1,4 +1,73 @@
-import type { IndustryCategory, InspectionSite } from "@/types";
+import type { IndustryCategory, InspectionSite, DailyWorkLog } from "@/types";
+
+export const DEFAULT_DAILY_LOG: DailyWorkLog = {
+  id: "LOG-2026-1119-01",
+  siteId: "SITE-2026-001",
+  siteName: "판교 알파리움 복합빌딩 신축공사",
+  reportDate: "2026-11-19",
+  weather: "맑음",
+  temperatureHigh: 14,
+  temperatureLow: 3,
+  author: "김현우 소장",
+  todayWork: [
+    "[골조공사] 지하 2층 매트기초 철근 배근 및 스페이서 점검 완료",
+    "[전기공사] 지하 2층 바닥 슬라브 매립 전선관 배관 및 박스 고정",
+    "[설비공사] 지하 2층 오배수 배관 인서트 슬리브 관통 작업",
+    "[안전관리] 개구부 추락방지 덮개 고정 및 안전난간대 점검 (지하 1층)",
+  ],
+  tomorrowWork: [
+    "[골조공사] 지하 2층 슬라브 레미콘 타설 (예정량 320m³ / 8-25-15)",
+    "[품질관리] 레미콘 슬럼프, 공기량, 염화물 현장 품질 시험 실시",
+    "[전기공사] 분전반 인입 간선 배관 라인 마킹 및 지지대 설치",
+  ],
+  manpower: [
+    { trade: "철근공", count: 8 },
+    { trade: "형틀목수", count: 5 },
+    { trade: "보통인부", count: 4 },
+    { trade: "콘크리트공", count: 3 },
+    { trade: "전기공", count: 2 },
+    { trade: "설비공", count: 2 },
+  ],
+  totalManpowerToday: 24,
+  cumulativeManpower: 268,
+  equipment: ["25톤 크레인 1대", "콘크리트 펌프카 1대", "고주파 바이브레이터 4대"],
+  material: ["이형철근 D25 (40톤)", "스페이서 블록 2,000개", "결속선 6박스"],
+  safetyNotes: "TBM 실시(07:00): 개구부 추락주의 및 레미콘 타설 호스 협착 방지 집중 교육 완료. 전원 보호구 착용 철저.",
+  photos: [
+    {
+      id: "DLP-01",
+      url: "https://images.unsplash.com/photo-1541888946425-d0fbb186156f?auto=format&fit=crop&w=800&q=80",
+      trade: "골조공사 (철근 배근)",
+      location: "지하 2층 B-3구역 매트기초",
+      caption: "상하부근 배근 간격 D25 @200 및 이음길이 준수 완료",
+      timestamp: "2026-11-19 10:30",
+    },
+    {
+      id: "DLP-02",
+      url: "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?auto=format&fit=crop&w=800&q=80",
+      trade: "골조공사 (피복두께)",
+      location: "지하 2층 C열 외벽 접합부",
+      caption: "피복두께 80mm 확보용 스페이서 1m 간격 배치",
+      timestamp: "2026-11-19 11:15",
+    },
+    {
+      id: "DLP-03",
+      url: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=80",
+      trade: "안전시설 (개구부)",
+      location: "지상 1층 E/V 피트 개구부",
+      caption: "개구부 안전덮개 체결 및 추락주의 경고 표지 부착",
+      timestamp: "2026-11-19 14:20",
+    },
+    {
+      id: "DLP-04",
+      url: "https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?auto=format&fit=crop&w=800&q=80",
+      trade: "거푸집공사",
+      location: "지하 1층 주차장 슬래브 하부",
+      caption: "동바리 수평연결재 2방향 체결 및 침하방지판 설치",
+      timestamp: "2026-11-19 15:40",
+    },
+  ],
+};
 
 export const INDUSTRY_OPTIONS: IndustryCategory[] = [
   "건설·시공·감리",
@@ -48,6 +117,7 @@ export const DEMO_SITES: InspectionSite[] = [
     completedItems: 6,
     failedItems: 2,
     status: "in_progress",
+    dailyLogs: [DEFAULT_DAILY_LOG],
     items: [
       {
         id: "CHK-01",
@@ -154,6 +224,7 @@ export const DEMO_SITES: InspectionSite[] = [
     completedItems: 3,
     failedItems: 1,
     status: "in_progress",
+    dailyLogs: [DEFAULT_DAILY_LOG],
     items: [
       {
         id: "QSC-01",
@@ -184,6 +255,22 @@ export const DEMO_SITES: InspectionSite[] = [
 ];
 
 export const PRICING_PLANS = [
+  {
+    name: "현장공정노트 Lite",
+    badge: "1인 소장·반장 추천",
+    price: "9,900",
+    description: "매일 저녁 1~2시간 서류 야근을 없애주는 1인 현장관리자 전용 작업일보 자동화 플랜입니다.",
+    features: [
+      "일일·주간 공사 작업일보 원클릭 자동 생성",
+      "사진 날짜·시간·위치 타임스탬프 자동 각인",
+      "발주처 제출용 국토부 표준 A4 PDF 무제한",
+      "시공일보 엑셀(.xlsx) 파일 원클릭 다운로드",
+      "공종별 출역(인원)·장비 투입 자동 합산",
+      "클라우드 사진 저장 10GB",
+    ],
+    ctaText: "월 9,900원으로 시작하기",
+    highlight: false,
+  },
   {
     name: "Starter",
     badge: "소규모 팀·개인",

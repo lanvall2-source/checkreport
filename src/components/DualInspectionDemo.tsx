@@ -26,6 +26,8 @@ import {
 import { DEMO_SITES } from "@/lib/constants";
 import { compressImage } from "@/lib/imageCompressor";
 import { exportToExcel, exportToPdf, printInspectionReport } from "@/lib/exportUtils";
+import { stampPhotoWithWatermark } from "@/lib/watermarkEngine";
+import { DailyWorkLogTab } from "./DailyWorkLogTab";
 import { RemoteQrModal } from "./RemoteQrModal";
 import { SiteBuilderModal } from "./SiteBuilderModal";
 import { SupabaseSettingsModal } from "./SupabaseSettingsModal";
@@ -50,7 +52,7 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
   });
 
   const [selectedSiteId, setSelectedSiteId] = useState<string>("SITE-2026-001");
-  const [activeTab, setActiveTab] = useState<"items" | "defects" | "report">("items");
+  const [activeTab, setActiveTab] = useState<"items" | "defects" | "report" | "dailylog">("items");
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [builderModalOpen, setBuilderModalOpen] = useState(false);
   const [supabaseModalOpen, setSupabaseModalOpen] = useState(false);
@@ -211,7 +213,20 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
 
     try {
       const compressResult = await compressImage(file, 1024, 1024, 0.75);
-      const dataUrl = compressResult.dataUrl;
+      let dataUrl = compressResult.dataUrl;
+
+      // 사진 법적 효력 타임스탬프 & 위치 워터마크 자동 각인
+      try {
+        const item = currentSite.items.find((i) => i.id === itemId);
+        dataUrl = await stampPhotoWithWatermark(dataUrl, {
+          siteName: currentSite.siteName,
+          location: item?.defectLocation || "현장 실측 구역",
+          trade: item?.category || "공사·시공",
+          author: currentSite.managerName,
+        });
+      } catch (wErr) {
+        console.warn("Watermark stamping skipped", wErr);
+      }
 
       const updatedSites = sites.map((site) => {
         if (site.id !== selectedSiteId) return site;
@@ -472,6 +487,20 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
             >
               <Printer className="w-3.5 h-3.5 text-blue-600 shrink-0" />
               <span>3. A4 사진대지 미리보기</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("dailylog")}
+              className={`py-3 sm:py-3.5 px-3 sm:px-4 border-b-2 cursor-pointer transition-colors flex items-center gap-1.5 whitespace-nowrap shrink-0 ${
+                activeTab === "dailylog"
+                  ? "border-indigo-600 text-indigo-600 font-black"
+                  : "border-transparent hover:text-slate-900"
+              }`}
+            >
+              <FileSpreadsheet className="w-3.5 h-3.5 text-indigo-600 shrink-0" />
+              <span>4. 현장공정노트 (작업일보)</span>
+              <span className="px-2 py-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-[10px] font-black rounded-full shadow-2xs">
+                원클릭 변환
+              </span>
             </button>
           </div>
 
@@ -826,6 +855,29 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* ========================================================= */}
+            {/* 탭 4: 현장공정노트 (작업일보 자동 보고서) */}
+            {/* ========================================================= */}
+            {activeTab === "dailylog" && (
+              <DailyWorkLogTab
+                site={currentSite}
+                onUpdateSite={(updatedSite) => {
+                  const updatedSites = sites.map((s) => (s.id === updatedSite.id ? updatedSite : s));
+                  setSites(updatedSites);
+                  try {
+                    localStorage.setItem("checkreport_sites", JSON.stringify(updatedSites));
+                  } catch {
+                    // ignore
+                  }
+                  saveSitesToCloud(updatedSites, userSession?.email);
+                }}
+                onNotify={(msg) => {
+                  setSyncToast(msg);
+                  setTimeout(() => setSyncToast(null), 3500);
+                }}
+              />
             )}
           </div>
         </div>

@@ -71,10 +71,12 @@ describe("체크리포트 (CheckReport) SaaS 무결성 테스트", () => {
     expect(siteNames).toContain("올리브치킨 강남본점");
   });
 
-  it("요금제 플랜(Starter, Pro, Enterprise) 구성 확인", () => {
-    expect(PRICING_PLANS.length).toBe(3);
-    expect(PRICING_PLANS[0].price).toBe("19,900");
-    expect(PRICING_PLANS[1].price).toBe("49,000");
+  it("요금제 플랜(Lite 9,900원, Starter, Pro, Enterprise) 구성 확인", () => {
+    expect(PRICING_PLANS.length).toBe(4);
+    expect(PRICING_PLANS[0].name).toBe("현장공정노트 Lite");
+    expect(PRICING_PLANS[0].price).toBe("9,900");
+    expect(PRICING_PLANS[1].price).toBe("19,900");
+    expect(PRICING_PLANS[2].price).toBe("49,000");
   });
 
   it("문제점 공감 카드 3개 정의 확인", () => {
@@ -118,5 +120,17 @@ describe("체크리포트 (CheckReport) SaaS 무결성 테스트", () => {
         expect(item.category.length).toBeGreaterThan(0);
       });
     });
+  });
+
+  it("현장공정노트(작업일보) 데이터 및 사진 워터마크 모듈 무결성 검증", () => {
+    const demoSite = DEMO_SITES[0];
+    expect(demoSite.dailyLogs).toBeDefined();
+    expect(demoSite.dailyLogs?.length).toBeGreaterThanOrEqual(1);
+
+    const log = demoSite.dailyLogs![0];
+    expect(log.todayWork.length).toBeGreaterThan(0);
+    expect(log.manpower.length).toBeGreaterThan(0);
+    expect(log.totalManpowerToday).toBeGreaterThan(0);
+    expect(log.photos.length).toBeGreaterThan(0);
   });
 });

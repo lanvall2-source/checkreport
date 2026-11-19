@@ -1,4 +1,4 @@
-import type { InspectionSite } from "@/types";
+import type { InspectionSite, DailyWorkLog } from "@/types";
 import { printInspectionReport } from "@/components/ReportPrintModal";
 
 /**
@@ -365,3 +365,138 @@ function createPrintHtmlElement(site: InspectionSite): HTMLElement {
  * ============================================================================
  */
 export { printInspectionReport };
+
+/**
+ * ============================================================================
+ * 4. 공사 작업일보 엑셀 (.xlsx) 자동 생성 및 다운로드 (국토부 표준 시공일보 양식)
+ * ============================================================================
+ */
+export async function exportDailyLogToExcel(site: InspectionSite, log: DailyWorkLog): Promise<boolean> {
+  const reportDate = log.reportDate || new Date().toISOString().split("T")[0];
+  const filename = `${sanitizeFilename(site.siteName)}_작업일보_${reportDate}.xlsx`;
+
+  try {
+    const win = window as any;
+    if (!win.XLSX) {
+      await loadExternalScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+    }
+
+    const XLSX = win.XLSX;
+    if (!XLSX) throw new Error("XLSX library unavailable");
+
+    const wb = XLSX.utils.book_new();
+
+    const sheetData: any[][] = [
+      ["공 사 작 업 일 보 (Daily Work Progress Report)"],
+      [],
+      ["■ 기본 정보"],
+      ["공사명", site.siteName, "", "보고 일자", `${reportDate} (${log.weather})`],
+      ["현장 주소", site.address, "", "기온", `${log.temperatureLow}℃ ~ ${log.temperatureHigh}℃`],
+      ["발주처", site.client, "", "작성자 / 소장", log.author || site.managerName],
+      [],
+      ["■ 출역 및 인원 투입 현황"],
+      ["공종(직종)", ...log.manpower.map((m) => m.trade), "금일 총원", "누계 총원"],
+      ["투입 인원", ...log.manpower.map((m) => `${m.count}명`), `${log.totalManpowerToday}명`, `${log.cumulativeManpower}명`],
+      [],
+      ["■ 금일 주요 시공 내역"],
+      ...log.todayWork.map((w, idx) => [`${idx + 1}`, w]),
+      [],
+      ["■ 명일 작업 예정 사항"],
+      ...log.tomorrowWork.map((w, idx) => [`${idx + 1}`, w]),
+      [],
+      ["■ 장비 및 자재 투입 현황"],
+      ["투입 장비", log.equipment.join(", ") || "해당없음"],
+      ["주요 자재", log.material.join(", ") || "해당없음"],
+      ["TBM 안전메모", log.safetyNotes || "해당없음"],
+      [],
+      ["■ 공종별 시공 사진 대지 현황"],
+      ["No.", "공종", "촬영 위치", "촬영 일시", "내용 / 캡션"],
+      ...log.photos.map((p, idx) => [
+        idx + 1,
+        p.trade,
+        p.location,
+        p.timestamp,
+        p.caption,
+      ]),
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+    ws["!cols"] = [
+      { wch: 12 },
+      { wch: 35 },
+      { wch: 15 },
+      { wch: 25 },
+      { wch: 35 },
+      { wch: 15 },
+    ];
+
+    XLSX.utils.book_append_sheet(wb, ws, "공사작업일보");
+    XLSX.writeFile(wb, filename);
+    return true;
+  } catch (err) {
+    console.warn("SheetJS XLSX generation failed, falling back to CSV", err);
+    const csvContent =
+      "\uFEFF" +
+      `"공사작업일보"\n"현장명","${site.siteName}","일자","${reportDate}"\n"날씨","${log.weather}","기온","${log.temperatureLow}~${log.temperatureHigh}℃"\n"금일출역총원","${log.totalManpowerToday}명","누계","${log.cumulativeManpower}명"\n\n"금일시공내역"\n${log.todayWork.map((w, i) => `"${i + 1}","${w}"`).join("\n")}\n\n"명일작업계획"\n${log.tomorrowWork.map((w, i) => `"${i + 1}","${w}"`).join("\n")}`;
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = filename.replace(/\.xlsx$/i, ".csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    return true;
+  }
+}
+
+/**
+ * ============================================================================
+ * 5. 공사 작업일보 A4 PDF (.pdf) 자동 생성 및 다운로드
+ * ============================================================================
+ */
+export async function exportDailyLogToPdf(
+  site: InspectionSite,
+  log: DailyWorkLog,
+  targetElementId: string = "daily-log-preview-sheet"
+): Promise<boolean> {
+  const reportDate = log.reportDate || new Date().toISOString().split("T")[0];
+  const filename = `${sanitizeFilename(site.siteName)}_작업일보_${reportDate}.pdf`;
+
+  try {
+    const win = window as any;
+    if (!win.html2pdf) {
+      await loadExternalScript("https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js");
+    }
+
+    const html2pdf = win.html2pdf;
+    if (!html2pdf) throw new Error("html2pdf library unavailable");
+
+    const targetElement = document.getElementById(targetElementId);
+    if (!targetElement) throw new Error(`Element #${targetElementId} not found`);
+
+    const opt = {
+      margin: [10, 10, 10, 10],
+      filename: filename,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        letterRendering: true,
+      },
+      jsPDF: {
+        unit: "mm",
+        format: "a4",
+        orientation: "portrait",
+      },
+      pagebreak: { mode: ["avoid-all", "css", "legacy"] },
+    };
+
+    await html2pdf().set(opt).from(targetElement).save();
+    return true;
+  } catch (err) {
+    console.warn("html2pdf export failed, falling back to window.print()", err);
+    window.print();
+    return false;
+  }
+}

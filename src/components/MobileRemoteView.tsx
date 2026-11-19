@@ -20,6 +20,7 @@ import { DEMO_SITES } from "@/lib/constants";
 import { compressImage } from "@/lib/imageCompressor";
 import { saveSitesToCloud } from "@/lib/cloudStore";
 import { exportToExcel, exportToPdf } from "@/lib/exportUtils";
+import { stampPhotoWithWatermark } from "@/lib/watermarkEngine";
 import type { InspectionSite, CheckItem, InspectionStatus } from "@/types";
 
 interface MobileRemoteViewProps {
@@ -123,6 +124,19 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
 
     try {
       const compressResult = await compressImage(file, 1024, 1024, 0.75);
+      let stampedUrl = compressResult.dataUrl;
+
+      // 사진 법적 효력 타임스탬프 & 위치 워터마크 자동 각인
+      try {
+        stampedUrl = await stampPhotoWithWatermark(compressResult.dataUrl, {
+          siteName: currentSite.siteName,
+          location: currentItem.defectLocation || "현장 모바일 점검",
+          trade: currentItem.category || "현장공정",
+          author: currentSite.managerName,
+        });
+      } catch (wErr) {
+        console.warn("Mobile watermark stamping skipped", wErr);
+      }
 
       const updatedSites = sites.map((site) => {
         if (site.id !== selectedSiteId) return site;
@@ -130,7 +144,7 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
           if (idx !== activeItemIndex) return it;
           return {
             ...it,
-            photoBefore: compressResult.dataUrl,
+            photoBefore: stampedUrl,
             status: it.status === "pending" ? ("pass" as const) : it.status,
           };
         });

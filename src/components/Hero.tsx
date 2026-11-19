@@ -12,8 +12,8 @@ export function Hero({ onOpenWaitlist, onScrollToDemo }: HeroProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         {/* 상단 타깃팅 알림 뱃지 */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-bold mb-6 shadow-2xs max-w-full text-center break-keep">
-          <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse shrink-0" />
-          <span>건설·시설·매장 현장 관리자의 칼퇴를 돕는 보고서 자동화 솔루션</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+          <span>[신규] 현장공정노트 — 작업일보 자동 생성 & 사진 타임스탬프 각인 탑재 (월 9,900원)</span>
         </div>
 
         {/* 메인 헤드라인 */}
@@ -67,8 +67,8 @@ export function Hero({ onOpenWaitlist, onScrollToDemo }: HeroProps) {
               <FileText className="w-4 h-4" />
             </div>
             <div className="text-xs break-keep">
-              <span className="font-bold text-slate-800 block">A4 사진대지 1초 출력</span>
-              <span className="text-slate-500">사진 오려 붙이던 야근 100% 해소</span>
+              <span className="font-bold text-slate-800 block">공사 작업일보 & 사진대지</span>
+              <span className="text-slate-500">클릭 1번에 A4 PDF·엑셀 즉시 완성</span>
             </div>
           </div>
 
