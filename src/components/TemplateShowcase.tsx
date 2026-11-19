@@ -1,8 +1,46 @@
 import React, { useState } from "react";
-import { HardHat, Building, Store, Factory, ArrowRight, Check } from "lucide-react";
+import { HardHat, Building, Store, Factory, ArrowRight, Check, FileSpreadsheet, Download, CheckCircle2, Sparkles } from "lucide-react";
+import { downloadFreeTemplate } from "@/lib/exportUtils";
 
 export function TemplateShowcase() {
   const [activeTab, setActiveTab] = useState<number>(0);
+  const [downloading, setDownloading] = useState<string | null>(null);
+
+  const handleDownloadTemplate = async (type: "dailylog" | "photobook" | "safety" | "facility") => {
+    setDownloading(type);
+    try {
+      await downloadFreeTemplate(type);
+    } finally {
+      setDownloading(null);
+    }
+  };
+
+  const FREE_TEMPLATES = [
+    {
+      id: "tpl-1",
+      type: "dailylog" as const,
+      name: "국토부 표준 공사 작업일보",
+      desc: "결재란, 날씨·기온, 출역 인원, 금일 시공 및 명일 계획이 정형화된 표준 시공일보 양식",
+    },
+    {
+      id: "tpl-2",
+      type: "photobook" as const,
+      name: "건설 감리 A4 현장 사진대지",
+      desc: "조치 전/후 비교 사진, 결함 위치 및 지적 메모를 깔끔하게 출력하는 A4 사진첩 서식",
+    },
+    {
+      id: "tpl-3",
+      type: "safety" as const,
+      name: "중대재해대응 일일 안전점검표",
+      desc: "개구부 추락방지, 비계 발판, 보호구 착용, 낙하물 방호 일일 순찰 점검 체크리스트",
+    },
+    {
+      id: "tpl-4",
+      type: "facility" as const,
+      name: "빌딩 소방·전기 시설점검표",
+      desc: "화재수신기 감시, 방화문 자동폐쇄, 수배전반 유온, 배수펌프 정기점검 표준 서식",
+    },
+  ];
 
   const categories = [
     {
@@ -145,6 +183,70 @@ export function TemplateShowcase() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* 무료 실무 엑셀 서식 다운로드 센터 (SEO & 리드 마그넷) */}
+        <div className="mt-16 pt-12 border-t border-slate-200">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 text-center md:text-left">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                <span>회원가입 없이 100% 무료 제공 (Excel .xlsx)</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+                현장 실무 필수 표준 엑셀 서식 무료 다운로드
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+                국토교통부 표준 시공일보, 감리 A4 사진대지, 중대재해 안전점검표 서식을 즉시 다운받아 현장 업무에 활용하세요.
+              </p>
+            </div>
+            <a
+              href="#demo"
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all whitespace-nowrap self-center md:self-auto"
+            >
+              <span>스마트폰 1초 자동 생성 체험하기</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {FREE_TEMPLATES.map((tpl) => (
+              <div
+                key={tpl.id}
+                className="bg-slate-50 border border-slate-200 hover:border-blue-400 p-5 rounded-2xl flex flex-col justify-between transition-all hover:shadow-md group"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <FileSpreadsheet className="w-5 h-5" />
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
+                      .XLSX 서식
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-slate-900 text-sm">{tpl.name}</h4>
+                  <p className="text-xs text-slate-500 mt-1.5 leading-relaxed min-h-[36px]">
+                    {tpl.desc}
+                  </p>
+                </div>
+
+                <div className="mt-5 pt-3 border-t border-slate-200 flex items-center justify-between">
+                  <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    <span>무료 배포</span>
+                  </span>
+                  <button
+                    onClick={() => handleDownloadTemplate(tpl.type)}
+                    disabled={downloading === tpl.type}
+                    className="px-3 py-1.5 bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer active:scale-95 shadow-2xs"
+                  >
+                    <Download className="w-3 h-3 text-emerald-600" />
+                    <span>{downloading === tpl.type ? "다운로드 중..." : "엑셀 저장"}</span>
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
