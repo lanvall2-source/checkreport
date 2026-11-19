@@ -25,7 +25,7 @@ import {
 } from "lucide-react";
 import { DEMO_SITES } from "@/lib/constants";
 import { compressImage } from "@/lib/imageCompressor";
-import { printInspectionReport } from "./ReportPrintModal";
+import { exportToExcel, exportToPdf, printInspectionReport } from "@/lib/exportUtils";
 import { RemoteQrModal } from "./RemoteQrModal";
 import { SiteBuilderModal } from "./SiteBuilderModal";
 import { SupabaseSettingsModal } from "./SupabaseSettingsModal";
@@ -135,6 +135,42 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
       // ignore
     } finally {
       if (!silent) setIsRefreshing(false);
+    }
+  };
+
+  // 실무 원클릭 다운로드 상태 및 핸들러 (Excel & PDF)
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
+
+  const handleExportExcel = async () => {
+    setIsExportingExcel(true);
+    setSyncToast("엑셀 보고서 (.xlsx) 생성 중...");
+    try {
+      await exportToExcel(currentSite);
+      setSyncToast("엑셀 파일 (.xlsx) 다운로드가 완료되었습니다.");
+      setTimeout(() => setSyncToast(null), 3000);
+    } catch (e) {
+      console.error(e);
+      setSyncToast("엑셀 생성 중 오류가 발생했습니다.");
+      setTimeout(() => setSyncToast(null), 3000);
+    } finally {
+      setIsExportingExcel(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true);
+    setSyncToast("A4 PDF 보고서 고해상도 변환 중...");
+    try {
+      await exportToPdf(currentSite, "report-preview-sheet");
+      setSyncToast("PDF 보고서 파일 다운로드가 완료되었습니다.");
+      setTimeout(() => setSyncToast(null), 3000);
+    } catch (e) {
+      console.error(e);
+      setSyncToast("PDF 변환 중 오류가 발생했습니다.");
+      setTimeout(() => setSyncToast(null), 3000);
+    } finally {
+      setIsExportingPdf(false);
     }
   };
 
@@ -308,17 +344,42 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
               </span>
             </div>
 
-            <div className="flex items-center gap-2.5 text-xs shrink-0">
-              <span className="text-slate-400 font-mono text-[11px] hidden sm:flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-xs shrink-0 flex-wrap justify-end">
+              <span className="text-slate-400 font-mono text-[11px] hidden xl:flex items-center gap-1.5 mr-1">
                 <Clock className="w-3.5 h-3.5 text-blue-400" />
                 <span>5분 주기</span>
               </span>
+
+              {/* Excel 다운로드 */}
+              <button
+                onClick={handleExportExcel}
+                disabled={isExportingExcel}
+                title="엑셀 사진대지 및 점검표 다운로드 (.xlsx)"
+                className="px-2.5 sm:px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs whitespace-nowrap active:scale-95 shadow-sm"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 shrink-0" />
+                <span>{isExportingExcel ? "생성중..." : "Excel 저장"}</span>
+              </button>
+
+              {/* PDF 다운로드 */}
+              <button
+                onClick={handleExportPdf}
+                disabled={isExportingPdf}
+                title="A4 규격 PDF 보고서 파일 직접 다운로드 (.pdf)"
+                className="px-2.5 sm:px-3 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white font-bold rounded-lg transition-all flex items-center gap-1.5 cursor-pointer text-xs whitespace-nowrap active:scale-95 shadow-sm"
+              >
+                <Download className="w-3.5 h-3.5 shrink-0" />
+                <span>{isExportingPdf ? "변환중..." : "PDF 저장"}</span>
+              </button>
+
+              {/* 인쇄창 열기 */}
               <button
                 onClick={() => printInspectionReport(currentSite)}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer text-xs whitespace-nowrap active:scale-95"
+                title="A4 인쇄 대화상자 열기"
+                className="px-2.5 sm:px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer text-xs whitespace-nowrap active:scale-95"
               >
                 <Printer className="w-3.5 h-3.5 shrink-0" />
-                <span>A4 사진대지 인쇄</span>
+                <span className="hidden sm:inline">인쇄</span>
               </button>
             </div>
           </div>
@@ -655,23 +716,46 @@ export function DualInspectionDemo({ userSession }: DualInspectionDemoProps = {}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-200 gap-3">
                   <div>
                     <h3 className="text-sm sm:text-base font-black text-slate-900 break-keep">
-                      {currentSite.templateTitle} — A4 사진대지 인쇄 양식
+                      {currentSite.templateTitle} — A4 사진대지 및 종합 리포트
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5 break-keep">
-                      현장에서 등록된 사진이 2단 격자로 자동 배치되며 결재란과 함께 PDF로 즉시 인쇄됩니다.
+                      현장 사진과 점검 내역이 A4 2단 표준 양식으로 자동 정렬되며, PDF/엑셀로 1초 만에 내려받을 수 있습니다.
                     </p>
                   </div>
-                  <button
-                    onClick={() => printInspectionReport(currentSite)}
-                    className="px-4 py-2 bg-[#2563EB] hover:bg-blue-700 text-white text-xs sm:text-sm font-bold rounded-xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 whitespace-nowrap shrink-0 self-start sm:self-auto"
-                  >
-                    <Printer className="w-4 h-4" />
-                    <span>실제 A4 PDF 인쇄하기</span>
-                  </button>
+                  <div className="flex items-center gap-2 flex-wrap shrink-0">
+                    {/* Excel 다운로드 */}
+                    <button
+                      onClick={handleExportExcel}
+                      disabled={isExportingExcel}
+                      className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 whitespace-nowrap"
+                    >
+                      <FileSpreadsheet className="w-4 h-4" />
+                      <span>{isExportingExcel ? "생성중..." : "Excel 다운로드 (.xlsx)"}</span>
+                    </button>
+
+                    {/* PDF 직접 다운로드 */}
+                    <button
+                      onClick={handleExportPdf}
+                      disabled={isExportingPdf}
+                      className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 whitespace-nowrap"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>{isExportingPdf ? "변환중..." : "PDF 직접 다운로드 (.pdf)"}</span>
+                    </button>
+
+                    {/* 인쇄 대화상자 */}
+                    <button
+                      onClick={() => printInspectionReport(currentSite)}
+                      className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition-all cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 whitespace-nowrap"
+                    >
+                      <Printer className="w-4 h-4" />
+                      <span>인쇄</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* 실제 A4 사진대지 프리뷰 시트 */}
-                <div className="bg-white border-2 border-slate-400 rounded-2xl p-4 sm:p-8 shadow-md text-xs font-sans space-y-4 overflow-hidden">
+                <div id="report-preview-sheet" className="bg-white border-2 border-slate-400 rounded-2xl p-4 sm:p-8 shadow-md text-xs font-sans space-y-4 overflow-hidden">
                   {/* 표지 헤더 및 결재란 */}
                   <div className="border-b-2 border-slate-900 pb-4">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">

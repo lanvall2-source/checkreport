@@ -13,10 +13,13 @@ import {
   FileText,
   Send,
   Plus,
+  FileSpreadsheet,
+  Download,
 } from "lucide-react";
 import { DEMO_SITES } from "@/lib/constants";
 import { compressImage } from "@/lib/imageCompressor";
 import { saveSitesToCloud } from "@/lib/cloudStore";
+import { exportToExcel, exportToPdf } from "@/lib/exportUtils";
 import type { InspectionSite, CheckItem, InspectionStatus } from "@/types";
 
 interface MobileRemoteViewProps {
@@ -45,6 +48,38 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
   const [activeItemIndex, setActiveItemIndex] = useState<number>(0);
   const [syncToast, setSyncToast] = useState<{ message: string; type: "success" | "loading" | "error" } | null>(null);
   const [isProcessingPhoto, setIsProcessingPhoto] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [isExportingExcel, setIsExportingExcel] = useState(false);
+
+  const handleExportExcel = async () => {
+    setIsExportingExcel(true);
+    setSyncToast({ message: "엑셀 파일 (.xlsx) 생성 중...", type: "loading" });
+    try {
+      await exportToExcel(currentSite);
+      setSyncToast({ message: "엑셀 파일 다운로드 완료!", type: "success" });
+      setTimeout(() => setSyncToast(null), 3000);
+    } catch {
+      setSyncToast({ message: "엑셀 생성 실패", type: "error" });
+      setTimeout(() => setSyncToast(null), 3000);
+    } finally {
+      setIsExportingExcel(false);
+    }
+  };
+
+  const handleExportPdf = async () => {
+    setIsExportingPdf(true);
+    setSyncToast({ message: "A4 PDF 보고서 변환 중...", type: "loading" });
+    try {
+      await exportToPdf(currentSite);
+      setSyncToast({ message: "PDF 파일 다운로드 완료!", type: "success" });
+      setTimeout(() => setSyncToast(null), 3000);
+    } catch {
+      setSyncToast({ message: "PDF 변환 실패", type: "error" });
+      setTimeout(() => setSyncToast(null), 3000);
+    } finally {
+      setIsExportingPdf(false);
+    }
+  };
 
   const currentSite = sites.find((s) => s.id === selectedSiteId) || sites[0];
   const currentItem = currentSite.items[activeItemIndex] || currentSite.items[0];
@@ -391,8 +426,28 @@ export function MobileRemoteView({ initialSiteId = "SITE-2026-001", onExitRemote
           )}
         </div>
 
+        {/* 모바일 현장 보고서 즉시 다운로드 버튼 바 */}
+        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80">
+          <button
+            onClick={handleExportExcel}
+            disabled={isExportingExcel}
+            className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 active:scale-98 text-emerald-400 font-bold text-[11px] rounded-xl border border-emerald-500/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5 shrink-0" />
+            <span>{isExportingExcel ? "생성중..." : "Excel 저장 (.xlsx)"}</span>
+          </button>
+          <button
+            onClick={handleExportPdf}
+            disabled={isExportingPdf}
+            className="py-2.5 px-3 bg-slate-800 hover:bg-slate-700 active:scale-98 text-rose-400 font-bold text-[11px] rounded-xl border border-rose-500/30 transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+          >
+            <Download className="w-3.5 h-3.5 shrink-0" />
+            <span>{isExportingPdf ? "변환중..." : "PDF 저장 (.pdf)"}</span>
+          </button>
+        </div>
+
         {/* 하단 이전/다음 항목 이동 및 최종 전송 바 */}
-        <div className="flex items-center gap-2 pt-1 pb-4">
+        <div className="flex items-center gap-2 pb-4">
           <button
             onClick={() => setActiveItemIndex((prev) => Math.max(0, prev - 1))}
             disabled={activeItemIndex === 0}
